@@ -1,5 +1,6 @@
 import os
 
+
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
 
@@ -43,7 +44,8 @@ LOGGING = {
 }
 
 PLUGINS = {
-    'daisie': {
+    'daisy': {
         'subreddit': 'https://www.reddit.com/r/DaisyRidley/',
     },
+    'log': {},
 }
