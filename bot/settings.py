@@ -45,7 +45,8 @@ LOGGING = {
 
 PLUGINS = {
     'daisy': {
-        'subreddit': 'https://www.reddit.com/r/DaisyRidley/',
+        'subreddit': 'DaisyRidley',
+        'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
     },
-    'log': {},
+    # 'log': {},
 }
