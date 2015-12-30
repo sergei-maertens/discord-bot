@@ -15,6 +15,13 @@ class Plugin(BasePlugin):
     unsubscribe_pattern = re.compile(r'!unsubscribe (?P<game>.+)', re.IGNORECASE)
     channel = 'general'
 
+    help = (
+        '`!subscribe <game>` sets up notifications for that game\n'
+        '`!unsubscribe <game>` deletes your subscription\n'
+        '`!unsubscribe !all` deletes all your subscriptions\n'
+        'Commands are case-insensitive'
+    )
+
     def _member_active(self, member):
         return member.status in ['online', 'idle'] and not member.is_afk and not member.game
 
@@ -22,6 +29,9 @@ class Plugin(BasePlugin):
         if member.game:
             game = member.game.name
             subscribers = GameNotification.objects.filter(game_name__iexact=game).exclude(user=member.id)
+            if not subscribers.exists():
+                return
+
             ids = subscribers.values_list('user', flat=True)
             members = [m for m in member.server.members if m.id in ids and self._member_active(m)]
             mentions = ', '.join([m.mention() for m in members])

@@ -78,6 +78,9 @@ PLUGINS = {
     # },
     'game_notifications': {
         'enabled': True,
+    },
+    'help': {
+        'enabled': True,
     }
 }
 
