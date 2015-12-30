@@ -1,2 +1,10 @@
+# python
 __pycache__
 *.pyc
+
+/env
+
+*.db
+
+# logging
+*.log

@@ -1,3 +1,4 @@
 discord.py
 praw
 bpython
+django==1.9
