@@ -5,6 +5,7 @@ DEBUG = bool(os.getenv('DEBUG', 0))
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
 
+SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
 
 LOGGING_CONFIG = 'logging.config.dictConfig'
 LOGGING = {
@@ -44,6 +45,28 @@ LOGGING = {
     }
 }
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'discord.db',
+    }
+}
+
+
+INSTALLED_APPS = [
+    'bot.plugins.game_notifications',
+]
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    },
+]
+
+
 PLUGINS = {
     'daisy': {
         'enabled': True,
@@ -53,4 +76,10 @@ PLUGINS = {
     'log': {
         'enabled': True,
     },
+    'game_notifications': {
+        'enabled': True,
+    }
 }
+
+
+ROOT_URLCONF = 'bot.urls'
