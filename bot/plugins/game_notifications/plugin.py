@@ -13,10 +13,21 @@ class Plugin(BasePlugin):
 
     subscribe_pattern = re.compile(r'!subscribe (?P<game>.+)', re.IGNORECASE)
     unsubscribe_pattern = re.compile(r'!unsubscribe (?P<game>.+)', re.IGNORECASE)
+    channel = 'general'
+
+    def _member_active(self, member):
+        return member.status in ['online', 'idle'] and not member.is_afk and not member.game
 
     def on_status(self, member, old_game, old_status):
         if member.game:
-            import bpdb; bpdb.set_trace()
+            game = member.game.name
+            subscribers = GameNotification.objects.filter(game_name__iexact=game).exclude(user=member.id)
+            ids = subscribers.values_list('user', flat=True)
+            members = [m for m in member.server.members if m.id in ids and self._member_active(m)]
+            mentions = ', '.join([m.mention() for m in members])
+            msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
+            channel = next((c for c in member.server.channels if c.name == self.channel), None)
+            self.client.send_message(channel, msg)
 
     def on_message(self, message):
         user = message.author.id
