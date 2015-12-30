@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Main entry point for the bot.
@@ -11,6 +12,7 @@ from importlib import import_module
 import discord
 
 from bot import settings
+from bot.plugins.base import MethodPool
 from bot.utils import configure_logging
 
 logger = logging.getLogger('bot')
@@ -29,15 +31,19 @@ def main():
     logger.info('Starting up bot')
 
     # login
-    client.login(settings.EMAIL, settings.PASSWORD)
+    if not settings.DEBUG:
+        client.login(settings.EMAIL, settings.PASSWORD)
 
+    pool = MethodPool()  # pool that holds all callbacks
     for plugin, options in settings.PLUGINS.items():
         _plugin = import_module('bot.plugins.%s' % plugin)
         plugin = _plugin.Plugin(client, options)
-        plugin.run()
+        pool.register(plugin)
+        pool.bind_to(client)
         logger.debug('Configured plugin %r', plugin)
 
-    client.run()
+    if not settings.DEBUG:
+        client.run()
 
 
 if __name__ == '__main__':

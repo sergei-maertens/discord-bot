@@ -1,5 +1,6 @@
 import os
 
+DEBUG = bool(os.getenv('DEBUG', 0))
 
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
@@ -45,8 +46,11 @@ LOGGING = {
 
 PLUGINS = {
     'daisy': {
+        'enabled': True,
         'subreddit': 'DaisyRidley',
         'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
     },
-    # 'log': {},
+    'log': {
+        'enabled': True,
+    },
 }
