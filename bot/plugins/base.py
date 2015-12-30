@@ -39,6 +39,7 @@ class MethodPool(dict):
         """
         Wraps all registered handlers in a function and binds it to the client.
         """
+        client._method_pool = self
         for event, handlers in self.items():
             grouper = self.group(handlers)
             grouper.__name__ = event

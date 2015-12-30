@@ -4,5 +4,7 @@ __pycache__
 
 /env
 
+*.db
+
 # logging
 *.log
