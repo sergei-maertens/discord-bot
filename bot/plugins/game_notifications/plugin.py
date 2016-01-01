@@ -34,6 +34,9 @@ class Plugin(BasePlugin):
 
             ids = subscribers.values_list('user', flat=True)
             members = [m for m in member.server.members if m.id in ids and self._member_active(m)]
+            if not members:
+                return
+
             mentions = ', '.join([m.mention() for m in members])
             msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
             channel = next((c for c in member.server.channels if c.name == self.channel), None)
