@@ -61,7 +61,7 @@ class Plugin(BasePlugin):
                 self.client.send_message(message.channel, 'Unsubscribed you from {num} games'.format(num=deleted))
                 return
 
-            deleted = GameNotification.objects.filter(user=user, game_name__iexact=game)
+            deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
             if deleted:
                 self.client.send_message(message.channel, 'Unsubscribed you from {game} games'.format(game=game))
             return
