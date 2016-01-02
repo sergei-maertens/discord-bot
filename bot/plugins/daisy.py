@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 class Plugin(BasePlugin):
 
+    has_blocking_io = True
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
