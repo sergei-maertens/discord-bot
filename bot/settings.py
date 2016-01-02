@@ -73,15 +73,15 @@ PLUGINS = {
         'subreddit': 'DaisyRidley',
         'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
     },
-    # 'log': {
-    #     'enabled': True,
-    # },
-    # 'game_notifications': {
-    #     'enabled': True,
-    # },
-    # 'help': {
-    #     'enabled': True,
-    # },
+    'log': {
+        'enabled': True,
+    },
+    'game_notifications': {
+        'enabled': True,
+    },
+    'help': {
+        'enabled': True,
+    },
     'test': {
         'enabled': True,
     },

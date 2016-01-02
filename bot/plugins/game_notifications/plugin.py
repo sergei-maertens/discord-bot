@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Plugin(BasePlugin):
 
+    has_blocking_io = True
     subscribe_pattern = re.compile(r'!subscribe (?P<game>.+)', re.IGNORECASE)
     unsubscribe_pattern = re.compile(r'!unsubscribe (?P<game>.+)', re.IGNORECASE)
     channel = 'general'
@@ -25,8 +26,9 @@ class Plugin(BasePlugin):
     def _member_active(self, member):
         return member.status in ['online', 'idle'] and not member.is_afk and not member.game
 
-    def on_status(self, member, old_game, old_status):
-        if member.game:
+    def on_member_update(self, before, after):
+        if after.game != before.game:
+            member = after
             game = member.game.name
             subscribers = GameNotification.objects.filter(game_name__iexact=game).exclude(user=member.id)
             if not subscribers.exists():
@@ -40,7 +42,7 @@ class Plugin(BasePlugin):
             mentions = ', '.join([m.mention() for m in members])
             msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
             channel = next((c for c in member.server.channels if c.name == self.channel), None)
-            self.client.send_message(channel, msg)
+            yield from self.client.send_message(channel, msg)
 
     def on_message(self, message):
         user = message.author.id
@@ -50,7 +52,7 @@ class Plugin(BasePlugin):
             game = match.group('game').strip()
             notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
             msg = 'Subscribed you to {game}' if created else 'You were already subscribed to {game}'
-            self.client.send_message(message.channel, msg.format(game=game))
+            yield from self.client.send_message(message.channel, msg.format(game=game))
             return
 
         match = re.match(self.unsubscribe_pattern, message.content)
@@ -58,10 +60,16 @@ class Plugin(BasePlugin):
             game = match.group('game').strip()
             if game.lower() == '!all':
                 deleted, _ = GameNotification.objects.filter(user=user).delete()
-                self.client.send_message(message.channel, 'Unsubscribed you from {num} games'.format(num=deleted))
+                yield from self.client.send_message(
+                    message.channel,
+                    'Unsubscribed you from {num} games'.format(num=deleted)
+                )
                 return
 
             deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
             if deleted:
-                self.client.send_message(message.channel, 'Unsubscribed you from {game} games'.format(game=game))
+                yield from self.client.send_message(
+                    message.channel,
+                    'Unsubscribed you from {game} games'.format(game=game)
+                )
             return
