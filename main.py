@@ -38,8 +38,10 @@ def main():
         _plugin = import_module(module)
         plugin = _plugin.Plugin(client, options)
         pool.register(plugin)
-        pool.bind_to(client)
         logger.debug('Configured plugin %r', plugin)
+
+    # bind the callback pool
+    pool.bind_to(client)
 
     # login & start
     client.run(settings.EMAIL, settings.PASSWORD)

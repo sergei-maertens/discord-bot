@@ -30,16 +30,34 @@ class MethodPool(dict):
         self[name].append(handler)
 
     def group(self, handlers):
+        """
+        Groups all handlers into one wrapping handler that distributes the event.
+
+        This is where the 'magic' happens. A distinction is made between plugins
+        and/or handlers that perform blocking IO (such as the reddit API wrapper,
+        Django ORM, ...). Blocking handlers are executed in a loop executor (by
+        default a thread pool), while real coroutines are just executed as-is.
+        """
+
         def grouped(*args, **kwargs):
-            coros = [handler(*args, **kwargs) for handler in handlers]
+            coros = []
+            for handler in handlers:
+                if handler._has_blocking_io:
+                    loop = self.client.loop
+                    future = loop.run_in_executor(None, functools.partial(handler, *args, **kwargs))
+                    coro = yield from future
+                    coros.append(coro)
+                else:
+                    handler = asyncio.coroutine(handler)(*args, **kwargs)  # real coroutine can be called
+                    coros.append(handler)
             yield from asyncio.gather(*coros)
-            return
         return grouped
 
     def bind_to(self, client):
         """
         Wraps all registered handlers in a function and binds it to the client.
         """
+        self.client = client
         client._method_pool = self
         for event, handlers in self.items():
             grouper = self.group(handlers)
@@ -67,7 +85,7 @@ class BasePlugin(object, metaclass=BasePluginMeta):
         self.options = options
 
     def _wrap(self, method):
-        handler = asyncio.coroutine(functools.partial(method, self))
+        handler = functools.partial(method, self)
         handler.__name__ = method.__name__
         handler._has_blocking_io = self.has_blocking_io
         return handler

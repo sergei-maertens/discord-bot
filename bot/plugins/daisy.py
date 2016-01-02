@@ -18,8 +18,12 @@ class Plugin(BasePlugin):
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
     def on_message(self, message):
-        if message.content.startswith('!daisy'):
+        if message.content == '!dr':
+            yield from self.client.send_typing(message.channel)
             subreddit = self.reddit_bot.get_subreddit(self.options['subreddit'])
-            submissions = [s for s in subreddit.get_hot(limit=50) if not s.selftext and 'imgur' in s.url]
+            logger.debug('Fetched subreddit')
+            submissions = [s for s in subreddit.get_hot(limit=50) if 'imgur' in s.url]
             submission = random.choice(submissions)
-            self.client.send_message(message.channel, submission.url)
+            logger.debug('Picked a submission')
+            yield from self.client.send_message(message.channel, submission.url)
+            logger.debug('Sent message')

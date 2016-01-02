@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from bot.plugins.base import BasePlugin
@@ -13,4 +14,6 @@ class Plugin(BasePlugin):
             return
 
         if message.content.startswith('!'):
-            yield from self.client.send_message(message.channel, 'Debug handler ok')
+            for i in [1, 2, 5]:
+                logger.debug('Sleeping for %d seconds', i)
+                yield from asyncio.sleep(i)
