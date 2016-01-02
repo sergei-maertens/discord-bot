@@ -81,7 +81,10 @@ PLUGINS = {
     },
     'help': {
         'enabled': True,
-    }
+    },
+    'test': {
+        'enabled': False,
+    },
 }
 
 

@@ -8,4 +8,4 @@ class Plugin(BasePlugin):
             plugins = self.client._method_pool.plugin_handlers.keys()
             help_messages = [plugin.help for plugin in plugins if hasattr(plugin, 'help')]
             msg = '\n\n'.join(help_messages)
-            self.client.send_message(message.channel, msg)
+            yield from self.client.send_message(message.channel, msg)
