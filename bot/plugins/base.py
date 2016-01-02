@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import functools
 
@@ -31,7 +32,7 @@ class MethodPool(dict):
     def group(self, handlers):
         def grouped(*args, **kwargs):
             for handler in handlers:
-                handler(*args, **kwargs)
+                yield from handler(*args, **kwargs)
             return
         return grouped
 
@@ -43,7 +44,7 @@ class MethodPool(dict):
         for event, handlers in self.items():
             grouper = self.group(handlers)
             grouper.__name__ = event
-            client.event(grouper)
+            client.async_event(grouper)
 
 
 class BasePluginMeta(type):
@@ -59,11 +60,13 @@ class BasePluginMeta(type):
 
 class BasePlugin(object, metaclass=BasePluginMeta):
 
+    has_blocking_io = False  # set to True to run events in an executor
+
     def __init__(self, client, options):
         self.client = client
         self.options = options
 
     def _wrap(self, method):
-        handler = functools.partial(method, self)
+        handler = asyncio.coroutine(functools.partial(method, self))
         handler.__name__ = method.__name__
         return handler

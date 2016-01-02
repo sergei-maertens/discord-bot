@@ -21,7 +21,7 @@ logger = logging.getLogger('bot')
 client = discord.Client()
 
 
-@client.event
+@client.async_event
 def on_ready():
     logger.info('Logged in as %s, id: %s', client.user.name, client.user.id)
 
@@ -29,10 +29,6 @@ def on_ready():
 def main():
     django.setup()  # configures logging etc.
     logger.info('Starting up bot')
-
-    # login
-    if not settings.DEBUG:
-        client.login(settings.EMAIL, settings.PASSWORD)
 
     pool = MethodPool()  # pool that holds all callbacks
     for plugin, options in settings.PLUGINS.items():
@@ -45,8 +41,8 @@ def main():
         pool.bind_to(client)
         logger.debug('Configured plugin %r', plugin)
 
-    if not settings.DEBUG:
-        client.run()
+    # login & start
+    client.run(settings.EMAIL, settings.PASSWORD)
 
 
 if __name__ == '__main__':
