@@ -32,6 +32,9 @@ def main():
 
     pool = MethodPool()  # pool that holds all callbacks
     for plugin, options in settings.PLUGINS.items():
+        if not options.get('enabled', True):
+            continue
+
         module = 'bot.plugins.%s' % plugin
         if module in settings.INSTALLED_APPS:
             module = '%s.plugin' % module

@@ -83,7 +83,7 @@ PLUGINS = {
         'enabled': True,
     },
     'test': {
-        'enabled': True,
+        'enabled': False,
     },
 }
 
