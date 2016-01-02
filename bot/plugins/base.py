@@ -31,8 +31,8 @@ class MethodPool(dict):
 
     def group(self, handlers):
         def grouped(*args, **kwargs):
-            for handler in handlers:
-                yield from handler(*args, **kwargs)
+            coros = [handler(*args, **kwargs) for handler in handlers]
+            yield from asyncio.gather(*coros)
             return
         return grouped
 
@@ -69,4 +69,5 @@ class BasePlugin(object, metaclass=BasePluginMeta):
     def _wrap(self, method):
         handler = asyncio.coroutine(functools.partial(method, self))
         handler.__name__ = method.__name__
+        handler._has_blocking_io = self.has_blocking_io
         return handler

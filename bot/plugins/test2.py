@@ -1,5 +1,4 @@
 import logging
-import asyncio
 
 from bot.plugins.base import BasePlugin
 
@@ -14,6 +13,4 @@ class Plugin(BasePlugin):
             return
 
         if message.content.startswith('!test'):
-            yield from self.client.send_message(message.channel, 'First handler')
-            yield from asyncio.sleep(3.0)
-            yield from self.client.send_message(message.channel, 'First handler, message 2')
+            yield from self.client.send_message(message.channel, 'Second handler')
