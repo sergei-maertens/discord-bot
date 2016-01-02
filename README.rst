@@ -51,6 +51,10 @@ secrets to the big bad outside world:
 Set these envvars in your shell, or in my case, they are added to the ``supervisord``
 config file (see ``discord-bot.ini``).
 
+Create the necessary database tables::
+
+    $ python manage.py migrate
+
 Start the bot by executing::
 
     $ python main.py
