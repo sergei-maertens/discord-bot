@@ -56,6 +56,7 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'bot.plugins.game_notifications',
+    'bot.users',
 ]
 
 
@@ -85,6 +86,10 @@ PLUGINS = {
     'test': {
         'enabled': False,
     },
+    'system': {
+        'enabled': True,
+        'owner_id': os.getenv('OWNER_ID'),
+    }
 }
 
 
