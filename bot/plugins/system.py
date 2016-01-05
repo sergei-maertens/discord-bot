@@ -1,5 +1,12 @@
 import asyncio
+import datetime
 import logging
+import os
+import platform
+
+import psutil
+from django.template.defaultfilters import filesizeformat
+from django.utils.timesince import timesince
 
 from bot.plugins.base import BasePlugin
 from bot.users.models import Member
@@ -14,10 +21,8 @@ class Plugin(BasePlugin):
 
     command_map = {
         '!restart': 'restart',
+        '!sysinfo': 'sysinfo',
     }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def on_message(self, message):
         cmd = message.content.lower()
@@ -26,6 +31,7 @@ class Plugin(BasePlugin):
             handler = getattr(self, self.command_map[cmd])
             yield from handler(message)
 
+    @asyncio.coroutine
     def restart(self, message):
         """
         Restarts the bot.
@@ -46,3 +52,20 @@ class Plugin(BasePlugin):
             raise KeyboardInterrupt
         else:
             yield from self.client.send_message(message.channel, 'Nope, denied.')
+
+    @asyncio.coroutine
+    def sysinfo(self, message):
+        process = psutil.Process(os.getpid())
+        mem_usage = process.memory_info().rss
+        created = datetime.datetime.fromtimestamp(int(process.create_time()))
+        msg = (
+            "Uptime: {uptime}\n"
+            "Memory usage: {mem}\n"
+            "OS: {system}, {release}\n"
+        ).format(
+            mem=filesizeformat(mem_usage),
+            uptime=timesince(created),
+            system=platform.system(),
+            release=platform.release(),
+        )
+        yield from self.client.send_message(message.channel, msg)

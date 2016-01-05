@@ -3,3 +3,5 @@ git+git@github.com:Rapptz/discord.py.git@async#egg=discord.py-async
 praw
 bpython
 django==1.9
+psutil==3.3.0
+pytz
