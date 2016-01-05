@@ -27,7 +27,7 @@ class Plugin(BasePlugin):
         return member.status in ['online', 'idle'] and not member.is_afk and not member.game
 
     def on_member_update(self, before, after):
-        if after.game != before.game:
+        if after.game and after.game != before.game:
             member = after
             game = member.game.name
             subscribers = GameNotification.objects.filter(game_name__iexact=game).exclude(user=member.id)
