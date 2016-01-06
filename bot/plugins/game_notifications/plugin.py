@@ -1,6 +1,8 @@
 import logging
 import re
 
+from discord.enums import Status
+
 from bot.plugins.base import BasePlugin
 
 from .models import GameNotification
@@ -24,7 +26,8 @@ class Plugin(BasePlugin):
     )
 
     def _member_active(self, member):
-        return member.status in ['online', 'idle'] and not member.is_afk and not member.game
+        statuses = [Status.online, Status.idle]
+        return member.status in statuses and not member.is_afk and not member.game
 
     def on_member_update(self, before, after):
         if after.game and after.game != before.game:
