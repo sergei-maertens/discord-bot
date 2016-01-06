@@ -1,5 +1,7 @@
 import os
 
+PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
+
 DEBUG = bool(os.getenv('DEBUG', 0))
 
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
