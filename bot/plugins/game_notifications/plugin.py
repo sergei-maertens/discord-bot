@@ -42,7 +42,7 @@ class Plugin(BasePlugin):
             if not members:
                 return
 
-            mentions = ', '.join([m.mention() for m in members])
+            mentions = ', '.join([m.mention for m in members])
             msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
             channel = next((c for c in member.server.channels if c.name == self.channel), None)
             yield from self.client.send_message(channel, msg)
