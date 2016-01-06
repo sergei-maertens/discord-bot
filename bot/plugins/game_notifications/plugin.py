@@ -4,6 +4,7 @@ import re
 from discord.enums import Status
 
 from bot.plugins.base import BasePlugin
+from bot.plugins.commands import command
 
 from .models import GameNotification
 
@@ -14,14 +15,13 @@ logger = logging.getLogger(__name__)
 class Plugin(BasePlugin):
 
     has_blocking_io = True
-    subscribe_pattern = re.compile(r'!subscribe (?P<game>.+)', re.IGNORECASE)
-    unsubscribe_pattern = re.compile(r'!unsubscribe (?P<game>.+)', re.IGNORECASE)
     channel = 'general'
 
+    # TODO: refactor into the command API
     help = (
         '`!subscribe <game>` sets up notifications for that game\n'
         '`!unsubscribe <game>` deletes your subscription\n'
-        '`!unsubscribe !all` deletes all your subscriptions\n'
+        '`!unsubscribe_all` deletes all your subscriptions\n'
         'Commands are case-insensitive'
     )
 
@@ -47,32 +47,24 @@ class Plugin(BasePlugin):
             channel = next((c for c in member.server.channels if c.name == self.channel), None)
             yield from self.client.send_message(channel, msg)
 
-    def on_message(self, message):
-        user = message.author.id
+    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
+    def subscribe(self, command):
+        user = command.message.author.id
+        game = command.args.game
+        notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
+        msg = 'Subscribed you to {game}' if created else 'You were already subscribed to {game}'
+        yield from command.reply(msg.format(game=game))
 
-        match = re.match(self.subscribe_pattern, message.content)
-        if match:
-            game = match.group('game').strip()
-            notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
-            msg = 'Subscribed you to {game}' if created else 'You were already subscribed to {game}'
-            yield from self.client.send_message(message.channel, msg.format(game=game))
-            return
+    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
+    def unsubscribe(self, command):
+        user = command.message.author.id
+        game = command.args.game
+        deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
+        if deleted:
+            yield from command.reply('Unsubscribed you from {game}'.format(game=game))
 
-        match = re.match(self.unsubscribe_pattern, message.content)
-        if match:
-            game = match.group('game').strip()
-            if game.lower() == '!all':
-                deleted, _ = GameNotification.objects.filter(user=user).delete()
-                yield from self.client.send_message(
-                    message.channel,
-                    'Unsubscribed you from {num} games'.format(num=deleted)
-                )
-                return
-
-            deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
-            if deleted:
-                yield from self.client.send_message(
-                    message.channel,
-                    'Unsubscribed you from {game} games'.format(game=game)
-                )
-            return
+    @command()
+    def unsubscribe_all(self, command):
+        user = command.message.author.id
+        deleted, _ = GameNotification.objects.filter(user=user).delete()
+        yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))

@@ -71,27 +71,27 @@ TEMPLATES = [
 
 
 PLUGINS = {
-    'daisy': {
-        'enabled': True,
-        'subreddit': 'DaisyRidley',
-        'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
-    },
-    'log': {
-        'enabled': True,
-    },
+    # 'daisy': {
+    #     'enabled': True,
+    #     'subreddit': 'DaisyRidley',
+    #     'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
+    # },
+    # 'log': {
+    #     'enabled': True,
+    # },
     'game_notifications': {
         'enabled': True,
     },
-    'help': {
-        'enabled': True,
-    },
-    'test': {
-        'enabled': False,
-    },
-    'system': {
-        'enabled': True,
-        'owner_id': os.getenv('OWNER_ID'),
-    }
+    # 'help': {
+    #     'enabled': True,
+    # },
+    # 'test': {
+    #     'enabled': False,
+    # },
+    # 'system': {
+    #     'enabled': True,
+    #     'owner_id': os.getenv('OWNER_ID'),
+    # }
 }
 
 
