@@ -53,6 +53,10 @@ class Command(object):
         return self.for_message
 
     @asyncio.coroutine
+    def send_typing(self, dest=None):
+        yield from self.client.send_typing(dest or self.for_message.channel)
+
+    @asyncio.coroutine
     def reply(self, text):
         channel = self.for_message.channel
         yield from self.client.send_message(channel, text)

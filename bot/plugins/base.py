@@ -124,6 +124,7 @@ class BasePlugin(object, metaclass=BasePluginMeta):
         return None
 
     def on_message(self, message):
+        import bpdb; bpdb.set_trace()
         result = self.get_command(message.content)
         if result:
             handler, command = result
