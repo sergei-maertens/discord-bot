@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 class Plugin(BasePlugin):
 
     has_blocking_io = True
-    channel = 'general'
 
     # TODO: refactor into the command API
     help = (
@@ -42,10 +41,10 @@ class Plugin(BasePlugin):
             if not members:
                 return
 
-            mentions = ', '.join([m.mention for m in members])
-            msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
-            channel = next((c for c in member.server.channels if c.name == self.channel), None)
-            yield from self.client.send_message(channel, msg)
+            msg = '{name} started playing {game}'.format(name=member.name, game=game)
+            for member in members:
+                yield from self.client.send_message(member, msg)
+                logger.info('Notified %s for %s', member.name, game)
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
     def subscribe(self, command):
