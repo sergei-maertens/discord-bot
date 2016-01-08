@@ -16,7 +16,6 @@ class Plugin(BasePlugin):
     has_blocking_io = True
     subscribe_pattern = re.compile(r'!subscribe (?P<game>.+)', re.IGNORECASE)
     unsubscribe_pattern = re.compile(r'!unsubscribe (?P<game>.+)', re.IGNORECASE)
-    channel = 'general'
 
     help = (
         '`!subscribe <game>` sets up notifications for that game\n'
@@ -42,10 +41,10 @@ class Plugin(BasePlugin):
             if not members:
                 return
 
-            mentions = ', '.join([m.mention for m in members])
-            msg = '{mentions}: {name} started playing {game}'.format(mentions=mentions, name=member.name, game=game)
-            channel = next((c for c in member.server.channels if c.name == self.channel), None)
-            yield from self.client.send_message(channel, msg)
+            msg = '{name} started playing {game}'.format(name=member.name, game=game)
+            for member in members:
+                yield from self.client.send_message(member, msg)
+                logger.info('Notified %s for %s', member.name, game)
 
     def on_message(self, message):
         user = message.author.id
