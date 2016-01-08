@@ -51,7 +51,7 @@ class Plugin(BasePlugin):
         else:
             yield from command.reply('Nope, denied.')
 
-    @command()
+    @command('sysinfo2')
     def sysinfo(self, command):
         process = psutil.Process(os.getpid())
         mem_usage = process.memory_info().rss

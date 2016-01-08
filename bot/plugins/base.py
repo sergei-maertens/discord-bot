@@ -111,7 +111,8 @@ class BasePlugin(object, metaclass=BasePluginMeta):
 
                 # Simple command
                 if handler._command.regex is None:
-                    return handler
+                    command = commands.Command(handler._command)
+                    return handler, command
 
                 # Regex matching, cut of the command part
                 str_to_test = msg.replace(cmd, '', 1).strip()
@@ -124,7 +125,6 @@ class BasePlugin(object, metaclass=BasePluginMeta):
         return None
 
     def on_message(self, message):
-        import bpdb; bpdb.set_trace()
         result = self.get_command(message.content)
         if result:
             handler, command = result
