@@ -86,7 +86,7 @@ class Plugin(BasePlugin):
         return
 
     @command('git pull')
-    def get_pull(self, command):
+    def git_pull(self, command):
         if not self.is_admin(command.message):
             yield from command.reply('Nope, denied.')
             return

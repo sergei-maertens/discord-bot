@@ -55,7 +55,7 @@ class Plugin(BasePlugin):
             yield from self.client.send_message(member, msg)
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def subscribe(self, command):
+    def subscribe2(self, command):
         user = command.message.author.id
         game = command.args.game
         notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
@@ -75,3 +75,10 @@ class Plugin(BasePlugin):
         user = command.message.author.id
         deleted, _ = GameNotification.objects.filter(user=user).delete()
         yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))
+
+    @command()
+    def list(self, command):
+        user = command.message.author.id
+        games = GameNotification.objects.filter(user=user).values_list('game_name', flat=True)
+        msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(games))
+        yield from command.reply(msg)

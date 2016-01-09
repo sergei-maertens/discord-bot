@@ -72,6 +72,13 @@ class BasePluginMeta(type):
 
     def __new__(mcs, name, bases, attrs):
         new_cls = super().__new__(mcs, name, bases, attrs)
+        new_cls.commands = {}  # required to prevent commands registering with the wrong plugin
+        new_cls._callbacks = {}
+
+        # inherit callbacks from parents
+        for base in bases:
+            if base._callbacks:
+                new_cls._callbacks.update(base._callbacks)
 
         for attr, val in new_cls.__dict__.items():
             # check for direct event handlers
@@ -86,11 +93,11 @@ class BasePluginMeta(type):
         return new_cls
 
 
-class BasePlugin(object, metaclass=BasePluginMeta):
+class BasePlugin(metaclass=BasePluginMeta):
 
     has_blocking_io = False  # set to True to run events in an executor
-    commands = {}
-    _callbacks = {}
+    commands = None
+    _callbacks = None
 
     def __init__(self, client, options):
         self.client = client
