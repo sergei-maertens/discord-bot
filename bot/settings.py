@@ -1,5 +1,7 @@
 import os
 
+PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
+
 DEBUG = bool(os.getenv('DEBUG', 0))
 
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
@@ -56,6 +58,7 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'bot.plugins.game_notifications',
+    'bot.users',
 ]
 
 
@@ -85,6 +88,10 @@ PLUGINS = {
     'test': {
         'enabled': False,
     },
+    'system': {
+        'enabled': True,
+        'owner_id': os.getenv('OWNER_ID'),
+    }
 }
 
 

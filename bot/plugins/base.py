@@ -1,6 +1,9 @@
 import asyncio
-import logging
 import functools
+import logging
+
+from . import commands
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,17 +71,33 @@ class MethodPool(dict):
 class BasePluginMeta(type):
 
     def __new__(mcs, name, bases, attrs):
-        handlers = {}
-        for attr, val in attrs.items():
+        new_cls = super().__new__(mcs, name, bases, attrs)
+        new_cls.commands = {}  # required to prevent commands registering with the wrong plugin
+        new_cls._callbacks = {}
+
+        # inherit callbacks from parents
+        for base in bases:
+            if base._callbacks:
+                new_cls._callbacks.update(base._callbacks)
+
+        for attr, val in new_cls.__dict__.items():
+            # check for direct event handlers
             if attr.startswith('on_'):
-                handlers[attr] = val
-        attrs['_callbacks'] = handlers
-        return super().__new__(mcs, name, bases, attrs)
+                new_cls._callbacks[attr] = val
+
+            # register the plugin commands
+            elif callable(val) and hasattr(val, '_command'):
+                cmd = '{0}{1}'.format(commands.PREFIX, val._command.name)
+                new_cls.commands[cmd] = asyncio.coroutine(val)
+
+        return new_cls
 
 
-class BasePlugin(object, metaclass=BasePluginMeta):
+class BasePlugin(metaclass=BasePluginMeta):
 
     has_blocking_io = False  # set to True to run events in an executor
+    commands = None
+    _callbacks = None
 
     def __init__(self, client, options):
         self.client = client
@@ -89,3 +108,33 @@ class BasePlugin(object, metaclass=BasePluginMeta):
         handler.__name__ = method.__name__
         handler._has_blocking_io = self.has_blocking_io
         return handler
+
+    def get_command(self, msg):
+        """
+        Get the command that matches with str:`msg`
+        """
+        for cmd, handler in self.commands.items():
+            if msg.lower().startswith(cmd.lower()):
+
+                # Simple command
+                if handler._command.regex is None:
+                    command = commands.Command(handler._command)
+                    return handler, command
+
+                # Regex matching, cut of the command part
+                str_to_test = msg.replace(cmd, '', 1).strip()
+                match = handler._command.regex.match(str_to_test)
+                if not match:
+                    continue
+
+                command = commands.Command(handler._command, **match.groupdict())
+                return handler, command
+        return None
+
+    def on_message(self, message):
+        result = self.get_command(message.content)
+        if result:
+            handler, command = result
+            command.for_message, command.client = message, self.client
+            assert asyncio.iscoroutinefunction(handler)
+            yield from handler(self, command)
