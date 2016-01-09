@@ -2,6 +2,7 @@ import logging
 import re
 
 from discord.enums import Status
+from django.conf import settings
 
 from bot.plugins.base import BasePlugin
 
@@ -26,25 +27,32 @@ class Plugin(BasePlugin):
 
     def _member_active(self, member):
         statuses = [Status.online, Status.idle]
-        return member.status in statuses and not member.is_afk and not member.game
+        gaming = member.game and settings.DEBUG is False
+        return member.status in statuses and not member.is_afk and not gaming
 
     def on_member_update(self, before, after):
-        if after.game and after.game != before.game:
-            member = after
-            game = member.game.name
-            subscribers = GameNotification.objects.filter(game_name__iexact=game).exclude(user=member.id)
-            if not subscribers.exists():
-                return
+        if not after.game:
+            return
 
-            ids = subscribers.values_list('user', flat=True)
-            members = [m for m in member.server.members if m.id in ids and self._member_active(m)]
-            if not members:
-                return
+        member = after
+        game = member.game.name
+        subscribers = GameNotification.objects.filter(game_name__iexact=game)
+        if settings.DEBUG:
+            subscribers = subscribers.filter(user=member.id)
+        else:
+            subscribers = subscribers.exclude(user=member.id)
+        if not subscribers.exists():
+            return
 
-            msg = '{name} started playing {game}'.format(name=member.name, game=game)
-            for member in members:
-                yield from self.client.send_message(member, msg)
-                logger.info('Notified %s for %s', member.name, game)
+        ids = subscribers.values_list('user', flat=True)
+        members = [m for m in member.server.members if m.id in ids and self._member_active(m)]
+        if not members:
+            return
+
+        msg = '{name} started playing {game}'.format(name=member.name, game=game)
+        for member in members:
+            logger.info('Notifying %s for %s', member.name, game)
+            yield from self.client.send_message(member, msg)
 
     def on_message(self, message):
         user = message.author.id
