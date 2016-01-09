@@ -71,13 +71,13 @@ class Plugin(BasePlugin):
         if deleted:
             yield from command.reply('Unsubscribed you from {game}'.format(game=game))
 
-    @command()
+    @command('unsubscribe !all')
     def unsubscribe_all(self, command):
         user = command.message.author.id
         deleted, _ = GameNotification.objects.filter(user=user).delete()
         yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))
 
-    @command('unsubscribe !all')
+    @command()
     def list(self, command):
         user = command.message.author.id
         games = GameNotification.objects.filter(user=user).values_list('game_name', flat=True)
