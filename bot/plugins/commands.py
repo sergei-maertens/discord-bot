@@ -27,7 +27,7 @@ class command(object):
         Decorator
         """
         if self.name is None:
-            self.name = func.__name__
+            self.name = func.__name__.replace('_', '')
         func._command = self
         return func
 

@@ -51,7 +51,7 @@ class Plugin(BasePlugin):
         else:
             yield from command.reply('Nope, denied.')
 
-    @command('sysinfo2')
+    @command()
     def sysinfo(self, command):
         process = psutil.Process(os.getpid())
         mem_usage = process.memory_info().rss
@@ -68,7 +68,7 @@ class Plugin(BasePlugin):
         )
         yield from command.reply(msg)
 
-    @command('git checkout', pattern=RE_CHECKOUT)
+    @command(pattern=RE_CHECKOUT)
     def git_checkout(self, command):
         if not self.is_admin(command.message):
             yield from command.reply('Nope, denied.')
@@ -85,7 +85,7 @@ class Plugin(BasePlugin):
             yield from command.reply('Checked out `%s`' % branch)
         return
 
-    @command('git pull')
+    @command()
     def git_pull(self, command):
         if not self.is_admin(command.message):
             yield from command.reply('Nope, denied.')

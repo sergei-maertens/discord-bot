@@ -21,7 +21,8 @@ class Plugin(BasePlugin):
     help = (
         '`!subscribe <game>` sets up notifications for that game\n'
         '`!unsubscribe <game>` deletes your subscription\n'
-        '`!unsubscribe_all` deletes all your subscriptions\n'
+        '`!unsubscribe !all` deletes all your subscriptions\n'
+        '`!list` lists your current subscriptions\b'
         'Commands are case-insensitive'
     )
 
@@ -55,7 +56,7 @@ class Plugin(BasePlugin):
             yield from self.client.send_message(member, msg)
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def subscribe2(self, command):
+    def subscribe(self, command):
         user = command.message.author.id
         game = command.args.game
         notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
@@ -76,7 +77,7 @@ class Plugin(BasePlugin):
         deleted, _ = GameNotification.objects.filter(user=user).delete()
         yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))
 
-    @command()
+    @command('unsubscribe !all')
     def list(self, command):
         user = command.message.author.id
         games = GameNotification.objects.filter(user=user).values_list('game_name', flat=True)
