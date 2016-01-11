@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 import os
@@ -56,15 +55,22 @@ class Plugin(BasePlugin):
         process = psutil.Process(os.getpid())
         mem_usage = process.memory_info().rss
         created = datetime.datetime.fromtimestamp(int(process.create_time()))
+
+        repo = Repo(settings.PROJECT_ROOT)
+
         msg = (
-            "Uptime: {uptime}\n"
-            "Memory usage: {mem}\n"
-            "OS: {system}, {release}\n"
+            "Uptime: `{uptime}`\n"
+            "Memory usage: `{mem}`\n"
+            "OS: `{system}, {release}`\n"
+            "Current branch: `{branch}`, `{commit}`, \n`{message}`\n"
         ).format(
             mem=filesizeformat(mem_usage),
             uptime=timesince(created),
             system=platform.system(),
             release=platform.release(),
+            branch=repo.active_branch.name,
+            commit=repo.active_branch.commit.hexsha,
+            message=repo.active_branch.commit.message,
         )
         yield from command.reply(msg)
 

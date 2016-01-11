@@ -91,6 +91,9 @@ PLUGINS = {
     'system': {
         'enabled': True,
         'owner_id': os.getenv('OWNER_ID'),
+    },
+    'random_commands': {
+        'enabled': True,
     }
 }
 
