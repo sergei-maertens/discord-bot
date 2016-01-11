@@ -56,7 +56,7 @@ class Plugin(BasePlugin):
             yield from self.client.send_message(member, msg)
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def subscribe(self, command):
+    def subscribe2(self, command):
         user = command.message.author.id
         game = command.args.game
         notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)

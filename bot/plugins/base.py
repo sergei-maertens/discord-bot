@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import logging
+import re
 
 from . import commands
 
@@ -125,7 +126,8 @@ class BasePlugin(metaclass=BasePluginMeta):
                     return handler, command
 
                 # Regex matching, cut of the command part
-                str_to_test = msg.replace(cmd, '', 1).strip()
+                regex = re.compile(r'%s ' % cmd, re.IGNORECASE)
+                str_to_test = re.sub(regex, '', msg, 1).strip()
                 match = handler._command.regex.match(str_to_test)
                 if not match:
                     continue
