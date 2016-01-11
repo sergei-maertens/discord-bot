@@ -118,6 +118,9 @@ class BasePlugin(metaclass=BasePluginMeta):
 
                 # Simple command
                 if handler._command.regex is None:
+                    # in this case, it must be the exact same command
+                    if msg.lower() != cmd.lower():
+                        continue
                     command = commands.Command(handler._command)
                     return handler, command
 
