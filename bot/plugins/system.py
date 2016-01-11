@@ -59,10 +59,10 @@ class Plugin(BasePlugin):
         repo = Repo(settings.PROJECT_ROOT)
 
         msg = (
-            "Uptime: {uptime}\n"
-            "Memory usage: {mem}\n"
-            "OS: {system}, {release}\n"
-            "Current branch: {branch} ({commit}, {message})\n"
+            "Uptime: `{uptime}`\n"
+            "Memory usage: `{mem}`\n"
+            "OS: `{system}, {release}`\n"
+            "Current branch: `{branch}`, `{commit}`, \n`{message}`\n"
         ).format(
             mem=filesizeformat(mem_usage),
             uptime=timesince(created),
