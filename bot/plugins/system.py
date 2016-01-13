@@ -29,6 +29,7 @@ class Plugin(BasePlugin):
     has_blocking_io = True
 
     @command()
+    @admin_required
     def restart(self, command):
         """
         Restarts the bot.
@@ -40,13 +41,10 @@ class Plugin(BasePlugin):
         FIXME: https://docs.python.org/3/library/asyncio-dev.html#pending-task-destroyed
         """
         author_id = command.message.author.id
-        if is_admin(command.message):
-            logger.info('Restart issued by %s, with ID %s', command.message.author.name, author_id)
-            yield from command.send_typing()
-            yield from command.reply('Restarting...')
-            raise KeyboardInterrupt
-        else:
-            yield from command.reply('Nope, denied.')
+        logger.info('Restart issued by %s, with ID %s', command.message.author.name, author_id)
+        yield from command.send_typing()
+        yield from command.reply('Restarting...')
+        raise KeyboardInterrupt
 
     @command()
     def sysinfo(self, command):
@@ -73,11 +71,8 @@ class Plugin(BasePlugin):
         yield from command.reply(msg)
 
     @command(pattern=RE_CHECKOUT)
+    @admin_required
     def git_checkout(self, command):
-        if not is_admin(command.message):
-            yield from command.reply('Nope, denied.')
-            return
-
         repo = Repo(settings.PROJECT_ROOT)
         branch = command.args.branch
         try:
@@ -90,21 +85,15 @@ class Plugin(BasePlugin):
         return
 
     @command()
+    @admin_required
     def git_pull(self, command):
-        if not is_admin(command.message):
-            yield from command.reply('Nope, denied.')
-            return
-
         repo = Repo(settings.PROJECT_ROOT)
         repo.remotes.origin.pull()
         yield from command.reply('Pulled the latest commits')
 
     @command()
+    @admin_required
     def migrate(self, command):
-        if not is_admin(command.message):
-            yield from command.reply('Can\'t touch this...')
-            return
-
         out = StringIO()
         call_command('migrate', interactive=False, no_color=True, stdout=out)
         out.seek(0)
