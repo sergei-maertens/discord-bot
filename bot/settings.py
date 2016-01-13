@@ -6,6 +6,7 @@ DEBUG = bool(os.getenv('DEBUG', 0))
 
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
+OWNER_ID = os.getenv('OWNER_ID')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
 
@@ -94,7 +95,6 @@ PLUGINS = {
     },
     'system': {
         'enabled': True,
-        'owner_id': os.getenv('OWNER_ID'),
     },
     'random_commands': {
         'enabled': True,

@@ -14,6 +14,7 @@ from git import Repo
 
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
+from bot.users.decorators import admin_required
 from bot.users.utils import is_admin
 
 
@@ -108,3 +109,15 @@ class Plugin(BasePlugin):
         call_command('migrate', interactive=False, no_color=True, stdout=out)
         out.seek(0)
         yield from command.reply(out.read())
+
+    @command()
+    @admin_required
+    def update_self(self, command):
+        """
+        Shortcut to update current branch
+        """
+        yield from command.reply('Starting full self update...')
+        yield from self.git_pull(command)
+        yield from self.migrate(command)
+        yield from self.sysinfo(command)
+        yield from self.restart(command)
