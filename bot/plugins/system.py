@@ -3,16 +3,18 @@ import logging
 import os
 import platform
 import re
+from io import StringIO
 
 import psutil
 from django.conf import settings
+from django.core.management import call_command
 from django.template.defaultfilters import filesizeformat
 from django.utils.timesince import timesince
 from git import Repo
 
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
-from bot.users.models import Member
+from bot.users.utils import is_admin
 
 
 logger = logging.getLogger(__name__)
@@ -24,11 +26,6 @@ RE_CHECKOUT = re.compile(r'(?P<branch>.+)$', re.IGNORECASE)
 class Plugin(BasePlugin):
 
     has_blocking_io = True
-
-    def is_admin(self, message):
-        author_id = message.author.id
-        qs = Member.objects.filter(discord_id=author_id, can_admin_bot=True)
-        return author_id == self.options['owner_id'] or qs.exists()
 
     @command()
     def restart(self, command):
@@ -42,7 +39,7 @@ class Plugin(BasePlugin):
         FIXME: https://docs.python.org/3/library/asyncio-dev.html#pending-task-destroyed
         """
         author_id = command.message.author.id
-        if self.is_admin(command.message):
+        if is_admin(command.message):
             logger.info('Restart issued by %s, with ID %s', command.message.author.name, author_id)
             yield from command.send_typing()
             yield from command.reply('Restarting...')
@@ -76,7 +73,7 @@ class Plugin(BasePlugin):
 
     @command(pattern=RE_CHECKOUT)
     def git_checkout(self, command):
-        if not self.is_admin(command.message):
+        if not is_admin(command.message):
             yield from command.reply('Nope, denied.')
             return
 
@@ -93,10 +90,21 @@ class Plugin(BasePlugin):
 
     @command()
     def git_pull(self, command):
-        if not self.is_admin(command.message):
+        if not is_admin(command.message):
             yield from command.reply('Nope, denied.')
             return
 
         repo = Repo(settings.PROJECT_ROOT)
         repo.remotes.origin.pull()
         yield from command.reply('Pulled the latest commits')
+
+    @command()
+    def migrate(self, command):
+        if not is_admin(command.message):
+            yield from command.reply('Can\'t touch this...')
+            return
+
+        out = StringIO()
+        call_command('migrate', interactive=False, no_color=True, stdout=out)
+        out.seek(0)
+        yield from command.reply(out.read())

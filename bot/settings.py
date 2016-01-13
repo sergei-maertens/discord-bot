@@ -58,6 +58,7 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'bot.plugins.game_notifications',
+    'bot.plugins.status',
     'bot.users',
 ]
 
@@ -103,6 +104,9 @@ PLUGINS = {
         'subreddit': 'todayilearned',
         'useragent': PRAW_USER_AGENT,
     },
+    'status': {
+        'enabled': True,
+    }
 }
 
 
