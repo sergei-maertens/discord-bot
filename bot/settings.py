@@ -70,11 +70,14 @@ TEMPLATES = [
 ]
 
 
+PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
+
+
 PLUGINS = {
     'daisy': {
         'enabled': True,
         'subreddit': 'DaisyRidley',
-        'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
+        'useragent': PRAW_USER_AGENT,
     },
     'log': {
         'enabled': True,
@@ -94,7 +97,12 @@ PLUGINS = {
     },
     'random_commands': {
         'enabled': True,
-    }
+    },
+    'til': {
+        'enabled': True,
+        'subreddit': 'todayilearned',
+        'useragent': PRAW_USER_AGENT,
+    },
 }
 
 
