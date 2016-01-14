@@ -13,10 +13,12 @@ class MethodPool(dict):
 
     # Track which handlers come from which plugin
     plugin_handlers = None
+    plugin_modules = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.plugin_handlers = {}
+        self.plugin_modules = {}
 
     def register(self, plugin):
         """
@@ -25,7 +27,8 @@ class MethodPool(dict):
         for handler, method in plugin._callbacks.items():
             wrapped = plugin._wrap(method)
             self.add(handler, wrapped)
-            self.plugin_handlers.setdefault(plugin.__module__, wrapped)
+            self.plugin_modules[plugin.__module__] = plugin
+            self.plugin_handlers[plugin] = wrapped
             logger.debug('Registered %r from %r', method, plugin)
 
     def add(self, name, handler):

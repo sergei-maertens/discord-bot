@@ -17,15 +17,6 @@ class Plugin(BasePlugin):
 
     has_blocking_io = True
 
-    # TODO: refactor into the command API
-    help = (
-        '`!subscribe <game>` sets up notifications for that game\n'
-        '`!unsubscribe <game>` deletes your subscription\n'
-        '`!unsubscribe !all` deletes all your subscriptions\n'
-        '`!list` lists your current subscriptions\b'
-        'Commands are case-insensitive'
-    )
-
     def _member_active(self, member):
         statuses = [Status.online, Status.idle]
         gaming = member.game and settings.DEBUG is False

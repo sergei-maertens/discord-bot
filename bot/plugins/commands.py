@@ -14,13 +14,14 @@ class command(object):
     Decorator for command handlers in bot Plugins.
     """
 
-    def __init__(self, name=None, pattern=None):
+    def __init__(self, name=None, pattern=None, help=None):
         assert not callable(name), 'You forgot the parentheses for the decorator'
 
         self.name = name
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.regex = pattern
+        self.help = help
 
     def __call__(self, func):
         """
@@ -28,8 +29,18 @@ class command(object):
         """
         if self.name is None:
             self.name = func.__name__.replace('_', ' ')
+        if self.help is None:
+            self.help = func.__doc__.strip().split('\n')[0] if func.__doc__ else None
         func._command = self
         return func
+
+    def as_help(self):
+        cmd = "`{prefix}{name}{pattern}`".format(
+            prefix=PREFIX,
+            name=self.name,
+            pattern=' {}'.format(self.regex.pattern) if self.regex else ''
+        )
+        return "{cmd}{spacer}{help}".format(cmd=cmd, help=self.help or '', spacer=' - ' if self.help else '')
 
 
 class Args(object):
