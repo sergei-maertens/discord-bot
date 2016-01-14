@@ -25,7 +25,7 @@ class MethodPool(dict):
         for handler, method in plugin._callbacks.items():
             wrapped = plugin._wrap(method)
             self.add(handler, wrapped)
-            self.plugin_handlers.setdefault(plugin, wrapped)
+            self.plugin_handlers.setdefault(plugin.__module__, wrapped)
             logger.debug('Registered %r from %r', method, plugin)
 
     def add(self, name, handler):
