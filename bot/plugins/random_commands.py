@@ -9,7 +9,7 @@ class Plugin(BasePlugin):
     @command()
     def penis(self, command):
         """
-        Draws an ASCI penis
+        Draws an ASCII penis
         """
         length = random.choice(range(3, 15))
         yield from command.reply('8{length}>'.format(length='='*length))
