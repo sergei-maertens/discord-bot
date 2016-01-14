@@ -48,6 +48,9 @@ class Plugin(BasePlugin):
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
     def subscribe(self, command):
+        """
+        Sets up notifications for <game>
+        """
         user = command.message.author.id
         game = command.args.game
         notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
@@ -56,6 +59,9 @@ class Plugin(BasePlugin):
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
     def unsubscribe(self, command):
+        """
+        Removes notification subscription for <game>
+        """
         user = command.message.author.id
         game = command.args.game
         deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
@@ -64,12 +70,18 @@ class Plugin(BasePlugin):
 
     @command('unsubscribe !all')
     def unsubscribe_all(self, command):
+        """
+        Removes all notifications subscriptions
+        """
         user = command.message.author.id
         deleted, _ = GameNotification.objects.filter(user=user).delete()
         yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))
 
     @command()
     def list(self, command):
+        """
+        Lists the current notification subscriptions
+        """
         user = command.message.author.id
         games = GameNotification.objects.filter(user=user).values_list('game_name', flat=True)
         msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(games))

@@ -20,6 +20,9 @@ class Plugin(BasePlugin):
 
     @command()
     def til(self, command):
+        """
+        Shows a random submission from r/todayilearned
+        """
         yield from command.send_typing()
         subreddit = self.reddit_bot.get_subreddit(self.options['subreddit'])
         logger.debug('Fetched subreddit')

@@ -15,7 +15,6 @@ from git import Repo
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.decorators import admin_required
-from bot.users.utils import is_admin
 
 
 logger = logging.getLogger(__name__)
@@ -48,6 +47,9 @@ class Plugin(BasePlugin):
 
     @command()
     def sysinfo(self, command):
+        """
+        Shows system/bot information
+        """
         process = psutil.Process(os.getpid())
         mem_usage = process.memory_info().rss
         created = datetime.datetime.fromtimestamp(int(process.create_time()))
@@ -94,6 +96,9 @@ class Plugin(BasePlugin):
     @command()
     @admin_required
     def migrate(self, command):
+        """
+        Migrates the database forward
+        """
         out = StringIO()
         call_command('migrate', interactive=False, no_color=True, stdout=out)
         out.seek(0)

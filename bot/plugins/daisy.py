@@ -4,6 +4,7 @@ import random
 import praw
 
 from bot.plugins.base import BasePlugin
+from bot.plugins.commands import command
 
 
 logger = logging.getLogger(__name__)
@@ -17,15 +18,16 @@ class Plugin(BasePlugin):
         super().__init__(*args, **kwargs)
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
-    def on_message(self, message):
-        if message.content != '!daisy':
-            return
-
-        yield from self.client.send_typing(message.channel)
+    @command()
+    def daisy(self, command):
+        """
+        Shows a random submission from r/DaisyRidley
+        """
+        yield from command.send_typing()
         subreddit = self.reddit_bot.get_subreddit(self.options['subreddit'])
         logger.debug('Fetched subreddit')
         submissions = [s for s in subreddit.get_hot(limit=50) if 'imgur' in s.url]
         submission = random.choice(submissions)
         logger.debug('Picked a submission')
-        yield from self.client.send_message(message.channel, submission.url)
+        yield from command.reply(submission.url)
         logger.debug('Sent message')
