@@ -1,8 +1,11 @@
 import logging
 import re
+from datetime import timedelta
 
 from discord.enums import Status
 from django.conf import settings
+from django.db.models import Q
+from django.utils import timezone
 
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
@@ -11,6 +14,8 @@ from .models import GameNotification
 
 
 logger = logging.getLogger(__name__)
+
+COOLDOWN = 5*60  # 5 minutes
 
 
 class Plugin(BasePlugin):
@@ -28,7 +33,9 @@ class Plugin(BasePlugin):
 
         member = after
         game = member.game.name
-        subscribers = GameNotification.objects.filter(game_name__iexact=game)
+        lower_limit = timezone.now() - timedelta(seconds=COOLDOWN)
+        q_last_notification = Q(last_notification__lt=lower_limit) | Q(last_notification__isnull=True)
+        subscribers = GameNotification.objects.filter(q_last_notification, game_name__iexact=game, muted=False)
         if settings.DEBUG:
             subscribers = subscribers.filter(user=member.id)
         else:
@@ -41,6 +48,7 @@ class Plugin(BasePlugin):
         if not members:
             return
 
+        subscribers.update(last_notification=timezone.now())
         msg = '{name} started playing {game}'.format(name=member.name, game=game)
         for member in members:
             logger.info('Notifying %s for %s', member.name, game)
@@ -83,6 +91,34 @@ class Plugin(BasePlugin):
         Lists the current notification subscriptions
         """
         user = command.message.author.id
-        games = GameNotification.objects.filter(user=user).values_list('game_name', flat=True)
-        msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(games))
+        games = GameNotification.objects.filter(user=user).values('game_name', 'muted')
+
+        _games = []
+        for game in games:
+            _games.append(
+                '{name}{muted}'.format(name=game['game_name'], muted=' (muted)' if game['muted'] else '')
+            )
+        msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(_games))
         yield from command.reply(msg)
+
+    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
+    def mute(self, command):
+        user = command.message.author.id
+        game = command.args.game
+        updated = GameNotification.objects.filter(user=user, game_name__iexact=game).update(muted=True)
+        if updated:
+            msg = 'Muted {game} notifications'
+        else:
+            msg = '{game} notifications were already muted'
+        yield from command.reply(msg.format(game=game))
+
+    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
+    def unmute(self, command):
+        user = command.message.author.id
+        game = command.args.game
+        updated = GameNotification.objects.filter(user=user, game_name__iexact=game).update(muted=False)
+        if updated:
+            msg = 'Unmuted {game} notifications'
+        else:
+            msg = '{game} notifications were not muted'
+        yield from command.reply(msg.format(game=game))
