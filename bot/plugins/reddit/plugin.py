@@ -28,6 +28,14 @@ class Plugin(BasePlugin):
     )
     def add_subreddit(self, command):
         cmd, subreddit = command.args.cmd, command.args.subreddit
+
+        try:
+            sr = self.reddit_bot.get_subreddit(subreddit)
+            [p for p in sr.get_top_from_day(limit=1)]
+        except praw.errors.InvalidSubreddit:
+            yield from command.reply('Subreddit `{}` does not exist'.format(subreddit))
+            return
+
         reddit_cmd, created = RedditCommand.objects.get_or_create(
             command=cmd, defaults={'subreddit': subreddit}
         )
