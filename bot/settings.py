@@ -59,6 +59,7 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'bot.plugins.game_notifications',
+    'bot.plugins.reddit',
     'bot.plugins.status',
     'bot.users',
 ]
@@ -98,6 +99,10 @@ PLUGINS = {
     },
     'random_commands': {
         'enabled': True,
+    },
+    'reddit': {
+        'enabled': True,
+        'useragent': PRAW_USER_AGENT,
     },
     'til': {
         'enabled': True,
