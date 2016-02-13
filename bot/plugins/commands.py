@@ -55,9 +55,10 @@ class Command(object):
     for_message = None
     client = None
 
-    def __init__(self, command, **kwargs):
+    def __init__(self, command, for_message=None, **kwargs):
         self.command = command
         self.args = Args(**kwargs)
+        self.for_message = for_message
 
     @property
     def message(self):

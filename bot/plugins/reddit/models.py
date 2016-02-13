@@ -12,9 +12,11 @@ class LowerCaseCharField(models.CharField):
 class RedditCommand(models.Model):
     command = LowerCaseCharField(_('command'), max_length=100, unique=True)
     subreddit = LowerCaseCharField(_('subreddit'), max_length=50)
+    times_used = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ('command', 'subreddit')
+        ordering = ['subreddit']
 
     def __str__(self):
         return '!{0.command} -> /r/{0.subreddit}'.format(self)

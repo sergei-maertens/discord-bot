@@ -78,7 +78,7 @@ PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
 
 PLUGINS = {
     'daisy': {
-        'enabled': True,
+        'enabled': False,
         'subreddit': 'DaisyRidley',
         'useragent': PRAW_USER_AGENT,
     },
@@ -105,7 +105,7 @@ PLUGINS = {
         'useragent': PRAW_USER_AGENT,
     },
     'til': {
-        'enabled': True,
+        'enabled': False,
         'subreddit': 'todayilearned',
         'useragent': PRAW_USER_AGENT,
     },
