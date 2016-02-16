@@ -58,6 +58,15 @@ DATABASES = {
 
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'bot.accounts',
+
     'bot.plugins.game_notifications',
     'bot.plugins.reddit',
     'bot.plugins.status',
@@ -116,3 +125,5 @@ PLUGINS = {
 
 
 ROOT_URLCONF = 'bot.urls'
+
+AUTH_USER_MODEL = 'accounts.User'
