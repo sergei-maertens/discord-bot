@@ -8,3 +8,7 @@ __pycache__
 
 # logging
 *.log
+
+
+# uploads/static
+/static/
