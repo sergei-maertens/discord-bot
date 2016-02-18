@@ -45,11 +45,18 @@ class Plugin(BasePlugin):
     @command(help='Lists the command to fetch submissions from a subreddit')
     def list_subreddits(self, command):
         i = 0
+        buffer_ = []
         for reddit_cmd in RedditCommand.objects.all():
             i += 1
-            yield from command.reply('{i}. {cmd} ({used}x used)'.format(
-                i=i, cmd=reddit_cmd, used=reddit_cmd.times_used)
-            )
+            line = '{i}. {cmd} ({used}x used)'.format(i=i, cmd=reddit_cmd, used=reddit_cmd.times_used)
+            buffer_.append(line)
+
+            if len(buffer_) % 10 == 0:
+                yield from command.reply("\n".join(buffer_))
+                buffer_ = []
+
+        if len(buffer_):
+            yield from command.reply("\n".join(buffer_))
 
     def on_message(self, message):
         yield from super().on_message(message)
