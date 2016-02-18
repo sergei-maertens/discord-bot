@@ -10,3 +10,9 @@ def is_bot_admin(message):
     author_id = message.author.id
     qs = Member.objects.filter(discord_id=author_id, can_admin_bot=True)
     return author_id == settings.OWNER_ID or qs.exists()
+
+
+def has_channel_permission(message, permission):
+    author = message.author
+    permissions = author.permissions_in(message.channel)
+    return getattr(permissions, permission)

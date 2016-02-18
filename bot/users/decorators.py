@@ -1,6 +1,33 @@
 from functools import wraps
 
-from .utils import is_bot_admin
+from .utils import is_bot_admin, has_channel_permission
+
+
+def command_passes_test(check_function, message='Insufficient permissions'):
+    """
+    Decorator factory that takes a function that tests the command for permission.
+    """
+    def decorator(func):
+        @wraps(func)
+        def _wrapped(plugin, command, *args, **kwargs):
+            if not check_function(command):
+                yield from command.reply(message)
+                return
+            yield from func(plugin, command, *args, **kwargs)
+        return _wrapped
+    return decorator
+
+
+def permission_required(permission):
+    def decorator(func):
+        @wraps(func)
+        def _wrapped(plugin, command, *args, **kwargs):
+            if not has_channel_permission(command.message, permission):
+                yield from command.reply('Insufficient permissions: `{}` required'.format(permission))
+                return
+            yield from func(plugin, command, *args, **kwargs)
+        return _wrapped
+    return decorator
 
 
 def bot_admin_required(func):

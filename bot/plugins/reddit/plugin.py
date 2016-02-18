@@ -8,12 +8,17 @@ from django.db.models import F
 from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command, Command, PREFIX
-from bot.users.decorators import bot_admin_required
+from bot.users.decorators import command_passes_test, is_bot_admin, has_channel_permission
 
 from .models import RedditCommand
 
 
 logger = logging.getLogger(__name__)
+
+
+def reddit_admin(command):
+    message = command.message
+    return has_channel_permission(message, 'manage_channels') or is_bot_admin(message)
 
 
 class Plugin(BasePlugin):
@@ -64,7 +69,7 @@ class Plugin(BasePlugin):
         pattern=re.compile(r'(?P<subreddit>[\w]+)', re.IGNORECASE),
         help='Mark a subreddit as NSFW. Specify the **subreddit** without the /r/, not the command.'
     )
-    @bot_admin_required
+    @command_passes_test(reddit_admin)
     def mark_nsfw(self, command):
         sr = command.args.subreddit
         rc = RedditCommand.objects.filter(subreddit=sr, nsfw=False)
@@ -76,7 +81,7 @@ class Plugin(BasePlugin):
         yield from command.reply('Marked **{sr}** as NSFW (affected {n} command(s))'.format(sr=sr, n=updated))
 
     @command(help='Mark this channel as NSFW allowed.')
-    @bot_admin_required
+    @command_passes_test(reddit_admin)
     def allow_nsfw(self, command):
         discord_channel = command.message.channel
         if discord_channel.is_private:
