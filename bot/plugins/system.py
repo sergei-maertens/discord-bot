@@ -14,7 +14,7 @@ from git import Repo
 
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
-from bot.users.decorators import admin_required
+from bot.users.decorators import bot_admin_required
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class Plugin(BasePlugin):
     has_blocking_io = True
 
     @command()
-    @admin_required
+    @bot_admin_required
     def restart(self, command):
         """
         Restarts the bot.
@@ -73,7 +73,7 @@ class Plugin(BasePlugin):
         yield from command.reply(msg)
 
     @command(pattern=RE_CHECKOUT)
-    @admin_required
+    @bot_admin_required
     def git_checkout(self, command):
         repo = Repo(settings.PROJECT_ROOT)
         branch = command.args.branch
@@ -87,14 +87,14 @@ class Plugin(BasePlugin):
         return
 
     @command()
-    @admin_required
+    @bot_admin_required
     def git_pull(self, command):
         repo = Repo(settings.PROJECT_ROOT)
         repo.remotes.origin.pull()
         yield from command.reply('Pulled the latest commits')
 
     @command()
-    @admin_required
+    @bot_admin_required
     def migrate(self, command):
         """
         Migrates the database forward
@@ -105,7 +105,7 @@ class Plugin(BasePlugin):
         yield from command.reply(out.read())
 
     @command()
-    @admin_required
+    @bot_admin_required
     def update_self(self, command):
         """
         Shortcut to update current branch

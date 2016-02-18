@@ -3,7 +3,7 @@ from django.conf import settings
 from .models import Member
 
 
-def is_admin(message):
+def is_bot_admin(message):
     """
     Takes a message and decides whether the author has admin status or not.
     """

@@ -8,7 +8,7 @@ from django.db.models import F
 from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command, Command, PREFIX
-from bot.users.decorators import admin_required
+from bot.users.decorators import bot_admin_required
 
 from .models import RedditCommand
 
@@ -64,7 +64,7 @@ class Plugin(BasePlugin):
         pattern=re.compile(r'(?P<subreddit>[\w]+)', re.IGNORECASE),
         help='Mark a subreddit as NSFW. Specify the **subreddit** without the /r/, not the command.'
     )
-    @admin_required
+    @bot_admin_required
     def mark_nsfw(self, command):
         sr = command.args.subreddit
         rc = RedditCommand.objects.filter(subreddit=sr, nsfw=False)
@@ -74,6 +74,23 @@ class Plugin(BasePlugin):
 
         updated = rc.update(nsfw=True)
         yield from command.reply('Marked **{sr}** as NSFW (affected {n} command(s))'.format(sr=sr, n=updated))
+
+    @command(help='Mark this channel as NSFW allowed.')
+    @bot_admin_required
+    def allow_nsfw(self, command):
+        discord_channel = command.message.channel
+        if discord_channel.is_private:
+            return
+
+        channel, _ = Channel.objects.get_or_create(
+            discord_id=discord_channel.id,
+            defaults={'name': discord_channel.name})
+        if channel.allow_nsfw:
+            yield from command.reply('Channel already allowed NSFW')
+            return
+        channel.allow_nsfw = True
+        channel.save()
+        yield from command.reply('NSFW is now allowed')
 
     @command(help='Lists the command to fetch submissions from a subreddit')
     def list_subreddits(self, command):
