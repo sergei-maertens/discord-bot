@@ -71,7 +71,11 @@ class Plugin(BasePlugin):
 
         for reddit_cmd in commands:
             i += 1
-            line = '{i}. {cmd} ({used}x used)'.format(i=i, cmd=reddit_cmd, used=reddit_cmd.times_used)
+            line = '{i}. {cmd} ({used}x used)'.format(
+                i=i, cmd=reddit_cmd, used=reddit_cmd.times_used
+            )
+            if reddit_cmd.nsfw:
+                line = '{} **NSFW**'.format(line)
             buffer_.append(line)
 
             if len(buffer_) % 10 == 0:
