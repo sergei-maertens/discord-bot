@@ -8,6 +8,7 @@ from django.db.models import F
 from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command, Command, PREFIX
+from bot.users.decorators import admin_required
 
 from .models import RedditCommand
 
@@ -58,6 +59,21 @@ class Plugin(BasePlugin):
         )
         tpl = 'Added %r' if created else 'Command already exists: %r'
         yield from command.reply(tpl % reddit_cmd)
+
+    @command(
+        pattern=re.compile(r'(?P<subreddit>[\w]+)', re.IGNORECASE),
+        help='Mark a subreddit as NSFW. Specify the **subreddit** without the /r/, not the command.'
+    )
+    @admin_required
+    def mark_nsfw(self, command):
+        sr = command.args.subreddit
+        rc = RedditCommand.objects.filter(subreddit=sr, nsfw=False)
+        if not rc.exists():
+            yield from command.reply('No command configured for {sr}'.format(sr=sr))
+            return
+
+        updated = rc.update(nsfw=True)
+        yield from command.reply('Marked **{sr}** as NSFW (affected {n} command(s))'.format(sr=sr, n=updated))
 
     @command(help='Lists the command to fetch submissions from a subreddit')
     def list_subreddits(self, command):
