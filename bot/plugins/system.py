@@ -115,3 +115,8 @@ class Plugin(BasePlugin):
         yield from self.migrate(command)
         yield from self.sysinfo(command)
         yield from self.restart(command)
+
+    @command(help="Shows your discord user id")
+    def discord_id(self, command):
+        member = command.message.author
+        yield from command.reply('{0.mention}: {0.id}'.format(member))
