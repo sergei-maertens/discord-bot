@@ -5,6 +5,7 @@ import re
 import praw
 from django.db.models import F
 
+from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command, Command, PREFIX
 
@@ -22,6 +23,22 @@ class Plugin(BasePlugin):
         super().__init__(*args, **kwargs)
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
+    def get_nsfw_allowed(self, command):
+        """
+        Allow NSFW subreddits if:
+        * it's a private message with the bot
+        * it's a channel explicitly marked as nsfw allowed
+        """
+        discord_channel = command.message.channel
+        if discord_channel.is_private:
+            return True
+        else:
+            channel, _ = Channel.objects.get_or_create(discord_id=discord_channel.id, defaults={
+                'name': discord_channel.name
+            })
+            return channel.allow_nsfw
+        return False
+
     @command(
         pattern=re.compile(r'!?(?P<cmd>.*): (?P<subreddit>.*)', re.IGNORECASE),
         help='Configure a command to show a subreddit submission'
@@ -31,13 +48,13 @@ class Plugin(BasePlugin):
 
         try:
             sr = self.reddit_bot.get_subreddit(subreddit)
-            [p for p in sr.get_top_from_day(limit=1)]
+            nsfw = sr.over18
         except praw.errors.InvalidSubreddit:
             yield from command.reply('Subreddit `{}` does not exist'.format(subreddit))
             return
 
         reddit_cmd, created = RedditCommand.objects.get_or_create(
-            command=cmd, defaults={'subreddit': subreddit}
+            command=cmd, defaults={'subreddit': subreddit, 'nsfw': nsfw}
         )
         tpl = 'Added %r' if created else 'Command already exists: %r'
         yield from command.reply(tpl % reddit_cmd)
@@ -46,7 +63,13 @@ class Plugin(BasePlugin):
     def list_subreddits(self, command):
         i = 0
         buffer_ = []
-        for reddit_cmd in RedditCommand.objects.all():
+
+        commands = RedditCommand.objects.all()
+        allow_nsfw = self.get_nsfw_allowed(command)
+        if not allow_nsfw:
+            commands = commands.filter(nsfw=False)
+
+        for reddit_cmd in commands:
             i += 1
             line = '{i}. {cmd} ({used}x used)'.format(i=i, cmd=reddit_cmd, used=reddit_cmd.times_used)
             buffer_.append(line)
@@ -73,6 +96,11 @@ class Plugin(BasePlugin):
             reddit_cmd.times_used = F('times_used') + 1
             reddit_cmd.save()
         except RedditCommand.DoesNotExist:
+            return
+
+        allow_nsfw = self.get_nsfw_allowed(command)
+        if reddit_cmd.nsfw and not allow_nsfw:
+            yield from command.reply('No NSFW commands allowed here')
             return
 
         yield from command.send_typing()

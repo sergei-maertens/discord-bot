@@ -14,6 +14,8 @@ class RedditCommand(models.Model):
     subreddit = LowerCaseCharField(_('subreddit'), max_length=50)
     times_used = models.PositiveIntegerField(default=0)
 
+    nsfw = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ('command', 'subreddit')
         ordering = ['subreddit']

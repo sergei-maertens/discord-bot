@@ -66,11 +66,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'bot.accounts',
+    'bot.channels',
+    'bot.users',
 
     'bot.plugins.game_notifications',
     'bot.plugins.reddit',
     'bot.plugins.status',
-    'bot.users',
 ]
 
 
