@@ -27,13 +27,18 @@ class Plugin(BasePlugin):
         else:
             yield from command.reply('Status already existed, pk: {}'.format(status.pk))
 
-    @command()
+    @command(pattern=re.compile(r'(?P<status>.*)?'))
     def change_status(self, command):
         """
         Randomly picks a new status
         """
-        status = GameStatus.objects.order_by('?').first()
-        game = Game(name=status.status)
+        status = command.args.status
+        if not status:
+            status = GameStatus.objects.order_by('?').values_list('status', flat=True).first()
+            if status is None:
+                yield from command.reply('I have no known statuses...')
+                return
+        game = Game(name=status)
         yield from self.client.change_status(game=game, idle=False)
 
     @command()

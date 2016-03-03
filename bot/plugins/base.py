@@ -129,7 +129,7 @@ class BasePlugin(metaclass=BasePluginMeta):
                     return handler, command
 
                 # Regex matching, cut of the command part
-                regex = re.compile(r'%s ' % cmd, re.IGNORECASE)
+                regex = re.compile(r'^%s' % cmd, re.IGNORECASE)
                 str_to_test = re.sub(regex, '', msg, 1).strip()
                 match = handler._command.regex.match(str_to_test)
                 if not match:
