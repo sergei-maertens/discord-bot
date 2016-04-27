@@ -126,11 +126,6 @@ PLUGINS = {
         'enabled': True,
         'useragent': PRAW_USER_AGENT,
     },
-    'til': {
-        'enabled': False,
-        'subreddit': 'todayilearned',
-        'useragent': PRAW_USER_AGENT,
-    },
     'status': {
         'enabled': True,
     }
