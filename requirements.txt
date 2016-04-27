@@ -8,3 +8,4 @@ pytz
 gitpython
 
 uwsgi==2.0.12
+psycopg2==2.6.1
