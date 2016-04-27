@@ -4,6 +4,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
 
 DEBUG = bool(os.getenv('DEBUG', 0))
 
+TOKEN = os.getenv('TOKEN') or 'my-discord-token'
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
 OWNER_ID = os.getenv('OWNER_ID')
