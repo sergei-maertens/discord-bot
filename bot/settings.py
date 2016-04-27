@@ -4,8 +4,10 @@ PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
 
 DEBUG = bool(os.getenv('DEBUG', 0))
 
+TOKEN = os.getenv('TOKEN') or 'my-discord-token'
 EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
+OWNER_ID = os.getenv('OWNER_ID')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
 
@@ -50,31 +52,59 @@ LOGGING = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'discord.db',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
     }
 }
 
-
 INSTALLED_APPS = [
-    'bot.plugins.game_notifications',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'bot.accounts',
+    'bot.channels',
     'bot.users',
+
+    'bot.plugins.game_notifications',
+    'bot.plugins.reddit',
+    'bot.plugins.stats',
+    'bot.plugins.status',
 ]
 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(PROJECT_ROOT, 'bot', 'templates'),
+        ],
         'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
     },
 ]
 
 
+PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
+
+
 PLUGINS = {
     'daisy': {
-        'enabled': True,
+        'enabled': False,
         'subreddit': 'DaisyRidley',
-        'useragent': 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)',
+        'useragent': PRAW_USER_AGENT,
     },
     'log': {
         'enabled': True,
@@ -90,12 +120,42 @@ PLUGINS = {
     },
     'system': {
         'enabled': True,
-        'owner_id': os.getenv('OWNER_ID'),
     },
     'random_commands': {
+        'enabled': True,
+    },
+    'reddit': {
+        'enabled': True,
+        'useragent': PRAW_USER_AGENT,
+    },
+    'status': {
         'enabled': True,
     }
 }
 
 
 ROOT_URLCONF = 'bot.urls'
+
+AUTH_USER_MODEL = 'accounts.User'
+
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_URL = '/static/'
+
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'botbt.xbbtx.be']
+
+
+WSGI_APPLICATION = 'bot.wsgi.application'
+
+
+MIDDLEWARE_CLASSES = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]

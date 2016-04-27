@@ -47,7 +47,7 @@ def main():
     pool.bind_to(client)
 
     # login & start
-    client.run(settings.EMAIL, settings.PASSWORD)
+    client.run(settings.TOKEN)
 
 
 if __name__ == '__main__':

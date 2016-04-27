@@ -19,15 +19,14 @@ class Plugin(BasePlugin):
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
     @command()
-    def daisy(self, command):
+    def til(self, command):
         """
-        Shows a random submission from r/DaisyRidley
+        Shows a random submission from r/todayilearned
         """
         yield from command.send_typing()
         subreddit = self.reddit_bot.get_subreddit(self.options['subreddit'])
         logger.debug('Fetched subreddit')
-        submissions = [s for s in subreddit.get_hot(limit=50) if 'imgur' in s.url]
+        submissions = [s for s in subreddit.get_hot(limit=50) if s.url]
         submission = random.choice(submissions)
         logger.debug('Picked a submission')
-        yield from command.reply(submission.url)
-        logger.debug('Sent message')
+        yield from command.reply('{title}\n{url}'.format(url=submission.url, title=submission.title))

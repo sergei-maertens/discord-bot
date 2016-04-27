@@ -1,8 +1,11 @@
 # discord.py
-git+https://github.com/Rapptz/discord.py.git@async#egg=discord.py-async
+git+https://github.com/Rapptz/discord.py.git@e0ca746ad4d32059ef5f48f9124ed5523a077821#egg=discord.py-async
 praw
 bpython
 django==1.9.1
 psutil==3.3.0
 pytz
 gitpython
+
+uwsgi==2.0.12
+psycopg2==2.6.1
