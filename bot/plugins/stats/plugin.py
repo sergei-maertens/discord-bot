@@ -72,7 +72,7 @@ class Plugin(BasePlugin):
     @command(help='Show the top 10 posters')
     def stat_messages(self, command):
         yield from command.send_typing()
-        queryset = Member.objects.annotate(num_messages=Count('messages_authored'))
+        queryset = Member.objects.exclude(is_bot=True).annotate(num_messages=Count('messages_authored'))
         top_10 = queryset.order_by('-num_messages')[:10]
         data = [(member.name or str(member), member.num_messages) for member in top_10]
         output = tabulate(data, headers=('User', 'messages'))
