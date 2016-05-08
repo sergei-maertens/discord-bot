@@ -18,3 +18,6 @@ class Plugin(BasePlugin):
         """
         Log the message in the db
         """
+        super().on_message(self, message)
+
+        import bpdb; bpdb.set_trace()
