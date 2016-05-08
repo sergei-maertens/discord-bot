@@ -133,7 +133,7 @@ PLUGINS = {
 
 
 USE_TZ = True
-DEFAULT_TIMEZONE = 'Europe/Amsterdam'
+TIME_ZONE = 'Europe/Amsterdam'
 
 ROOT_URLCONF = 'bot.urls'
 
