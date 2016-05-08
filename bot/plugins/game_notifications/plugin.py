@@ -15,7 +15,7 @@ from .models import GameNotification
 
 logger = logging.getLogger(__name__)
 
-COOLDOWN = 5*60  # 5 minutes
+COOLDOWN = 5 * 60  # 5 minutes
 
 
 class Plugin(BasePlugin):

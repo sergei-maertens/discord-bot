@@ -6,6 +6,7 @@ django==1.9.1
 psutil==3.3.0
 pytz
 gitpython
+tabulate
 
 uwsgi==2.0.12
 psycopg2==2.6.1

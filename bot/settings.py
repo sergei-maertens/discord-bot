@@ -101,11 +101,6 @@ PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
 
 
 PLUGINS = {
-    'daisy': {
-        'enabled': False,
-        'subreddit': 'DaisyRidley',
-        'useragent': PRAW_USER_AGENT,
-    },
     'log': {
         'enabled': True,
     },
@@ -116,7 +111,7 @@ PLUGINS = {
         'enabled': True,
     },
     'test': {
-        'enabled': False,
+        'enabled': True,
     },
     'system': {
         'enabled': True,
@@ -127,6 +122,9 @@ PLUGINS = {
     'reddit': {
         'enabled': True,
         'useragent': PRAW_USER_AGENT,
+    },
+    'stats': {
+        'enabled': True,
     },
     'status': {
         'enabled': True,

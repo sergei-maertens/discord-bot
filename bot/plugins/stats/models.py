@@ -12,6 +12,7 @@ class LoggedMessage(models.Model):
     channel = models.ForeignKey('channels.Channel')
 
     content = models.TextField()
+    num_lines = models.PositiveSmallIntegerField(default=1)
     timestamp = models.DateTimeField(auto_now_add=True)
     edited_timestamp = models.DateTimeField(null=True, blank=True)
 
