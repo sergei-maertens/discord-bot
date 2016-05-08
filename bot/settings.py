@@ -102,32 +102,32 @@ PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
 
 PLUGINS = {
     'log': {
-        'enabled': True,
+        'enabled': False,
     },
     'game_notifications': {
-        'enabled': True,
+        'enabled': False,
     },
     'help': {
-        'enabled': True,
+        'enabled': False,
     },
     'test': {
         'enabled': False,
     },
     'system': {
-        'enabled': True,
+        'enabled': False,
     },
     'random_commands': {
-        'enabled': True,
+        'enabled': False,
     },
     'reddit': {
-        'enabled': True,
+        'enabled': False,
         'useragent': PRAW_USER_AGENT,
     },
     'stats': {
         'enabled': True,
     },
     'status': {
-        'enabled': True,
+        'enabled': False,
     }
 }
 
