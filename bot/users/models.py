@@ -15,10 +15,10 @@ class MemberQuerySet(models.QuerySet):
         return self._get_member(message.author)[0]
 
     def from_mentions(self, mentions):
-        return [self._get_member(member) for member in mentions]
+        return [self._get_member(member)[0] for member in mentions]
 
     def from_discord(self, discord_user):
-        return self._get_member(discord_user)
+        return self._get_member(discord_user)[0]
 
 
 class Member(models.Model):

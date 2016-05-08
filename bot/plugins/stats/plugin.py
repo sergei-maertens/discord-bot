@@ -44,7 +44,6 @@ class Plugin(BasePlugin):
             num_lines=n_lines
         )
         if message.mentions:
-            import bpdb; bpdb.set_trace()
             logged_message.mentions = Member.objects.from_mentions(message.mentions)
 
     def on_message_edit(self, before, after):
