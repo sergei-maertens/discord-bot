@@ -132,6 +132,9 @@ PLUGINS = {
 }
 
 
+USE_TZ = True
+DEFAULT_TIMEZONE = 'Europe/Amsterdam'
+
 ROOT_URLCONF = 'bot.urls'
 
 AUTH_USER_MODEL = 'accounts.User'

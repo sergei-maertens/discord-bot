@@ -17,11 +17,16 @@ class MemberQuerySet(models.QuerySet):
     def from_mentions(self, mentions):
         return [self._get_member(member) for member in mentions]
 
+    def from_discord(self, discord_user):
+        return self._get_member(discord_user)
+
 
 class Member(models.Model):
     discord_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(_('name'), max_length=255)
+    last_seen = models.DateTimeField(null=True, blank=True)
 
+    is_bot = models.BooleanField(default=False)
     can_admin_bot = models.BooleanField(default=False)
 
     objects = MemberQuerySet.as_manager()
