@@ -1,9 +1,13 @@
 import logging
 
+from django.db.models import Count
 from django.utils.timezone import make_aware, utc
+
+from tabulate import tabulate
 
 from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
+from bot.plugins.commands import command
 from bot.users.models import Member
 
 from .models import LoggedMessage
@@ -50,3 +54,14 @@ class Plugin(BasePlugin):
         logged_message.content = after.content
         logged_message.num_lines = len(after.content.splitlines())
         logged_message.save()
+
+    # TODO: track status changes -> log how long anyone plays a game
+
+    @command(help='Show the top 10 posters')
+    def stat_messages(self, command):
+        yield from command.send_typing()
+        queryset = Member.objects.annotate(num_messages=Count('messages_authored'))
+        top_10 = queryset.order_by('-num_messages')[:10]
+        data = [(member.name or str(member), member.num_messages) for member in top_10]
+        output = tabulate(data, headers=('User', 'messages'))
+        yield from command.reply("```\n{}\n```".format(output))
