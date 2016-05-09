@@ -13,7 +13,7 @@ from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.models import Member
 
-from .models import LoggedMessage
+from .models import LoggedMessage, GameSession
 
 
 logger = logging.getLogger(__name__)
@@ -62,12 +62,25 @@ class Plugin(BasePlugin):
         if hasattr(super(), 'on_member_update'):
             yield from super().on_member_update(before, after)
 
+        member = Member.objects.from_discord(after)
+
         if before.status != after.status and after.status != Status.online:
-            member = Member.objects.from_discord(after)
             member.last_seen = now()
             member.save()
 
-    # TODO: track status changes -> log how long anyone plays a game
+        # started playing a game
+        if not before.game and after.game:
+            GameSession.objects.create(
+                member=member, game=after.game.name,
+                start=now()
+            )
+        # stopped playing
+        elif before.game and not after.game:
+            session = GameSession.objects.filter(member=member, game=before.game.name).latest('start')
+            if session:
+                session.stop = now()
+                session.duration = session.stop - session.start
+                session.save()
 
     @command(help='Show the top 10 posters')
     def stat_messages(self, command):
