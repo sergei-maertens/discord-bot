@@ -1,7 +1,7 @@
 import logging
 import re
 
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.utils.timesince import timesince
 from django.utils.timezone import make_aware, now, utc
 
@@ -13,7 +13,7 @@ from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.models import Member
 
-from .models import LoggedMessage
+from .models import LoggedMessage, GameSession
 
 
 logger = logging.getLogger(__name__)
@@ -62,12 +62,28 @@ class Plugin(BasePlugin):
         if hasattr(super(), 'on_member_update'):
             yield from super().on_member_update(before, after)
 
+        member = Member.objects.from_discord(after)
+
         if before.status != after.status and after.status != Status.online:
-            member = Member.objects.from_discord(after)
             member.last_seen = now()
             member.save()
 
-    # TODO: track status changes -> log how long anyone plays a game
+        # started playing a game
+        if not before.game and after.game:
+            GameSession.objects.create(
+                member=member, game=after.game.name,
+                start=now()
+            )
+        # stopped playing
+        elif before.game and not after.game:
+            try:
+                session = GameSession.objects.filter(member=member, game=before.game.name).latest('start')
+            except GameSession.DoesNotExist:
+                pass
+            else:
+                session.stop = now()
+                session.duration = session.stop - session.start
+                session.save()
 
     @command(help='Show the top 10 posters')
     def stat_messages(self, command):
@@ -75,7 +91,7 @@ class Plugin(BasePlugin):
         queryset = Member.objects.exclude(is_bot=True).annotate(num_messages=Count('messages_authored'))
         top_10 = queryset.order_by('-num_messages')[:10]
         data = [(member.name or str(member), member.num_messages) for member in top_10]
-        output = tabulate(data, headers=('User', 'messages'))
+        output = tabulate(data, headers=('User', 'Messages'))
         yield from command.reply("```\n{}\n```".format(output))
 
     @command(pattern=re.compile(r'(?P<name>.*)', re.IGNORECASE))
@@ -112,3 +128,22 @@ class Plugin(BasePlugin):
             )
             reply2 = "The last message was: ```{message}```".format(message=last_message.content)
             yield from command.reply("{}\n{}".format(reply1, reply2))
+
+    @command(help='Shows the most popular games in total play time')
+    def stat_games(self, command):
+        yield from command.send_typing()
+        games = GameSession.objects.values('game').annotate(
+            time=Sum('duration')
+        ).order_by('-time')[:15]
+
+        def format_delta(delta):
+            hours, seconds = divmod(delta.seconds, 3600)
+            minutes, seconds = divmod(seconds, 60)
+            min_minutes = not hours and not delta.days
+            return "{days} days, {hours} hours, {minutes} minutes".format(
+                days=delta.days, hours=hours, minutes=max(1, minutes) if min_minutes else minutes)
+
+        data = [
+            (game['game'], format_delta(game['time'])) for game in games
+        ]
+        yield from command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
