@@ -132,7 +132,7 @@ class Plugin(BasePlugin):
     @command(help='Shows the most popular games in total play time')
     def stat_games(self, command):
         yield from command.send_typing()
-        games = GameSession.objects.values('game').annotate(
+        games = GameSession.objects.filter(duration__isnull=False).values('game').annotate(
             time=Sum('duration')
         ).order_by('-time')[:15]
 
