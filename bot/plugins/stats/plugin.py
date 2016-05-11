@@ -133,8 +133,9 @@ class Plugin(BasePlugin):
     def stat_games(self, command):
         yield from command.send_typing()
         games = GameSession.objects.filter(duration__isnull=False).values('game').annotate(
-            time=Sum('duration')
-        ).order_by('-time')[:15]
+            time=Sum('duration'),
+            num_players=Count('member', distinct=True)
+        ).filter(num_players__gt=1).order_by('-time')[:15]
 
         def format_delta(delta):
             hours, seconds = divmod(delta.seconds, 3600)
