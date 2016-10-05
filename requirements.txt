@@ -1,7 +1,7 @@
 discord.py==0.13.0
 praw==3.3.0
 bpython
-django==1.9.1
+django==1.10.2
 psutil==3.3.0
 pytz==2016.7
 gitpython
