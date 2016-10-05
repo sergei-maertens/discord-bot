@@ -9,6 +9,7 @@ from discord.enums import Status
 from tabulate import tabulate
 
 from bot.channels.models import Channel
+from bot.games.models import Game
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.models import Member
@@ -70,14 +71,16 @@ class Plugin(BasePlugin):
 
         # started playing a game
         if not before.game and after.game:
+            game = Game.objects.get_by_name(after.game.name)
             GameSession.objects.create(
-                member=member, game=after.game.name,
+                member=member, game=game,
                 start=now()
             )
         # stopped playing
         elif before.game and not after.game:
+            game = game = Game.objects.get_by_name(before.game.name)
             try:
-                session = GameSession.objects.filter(member=member, game=before.game.name).latest('start')
+                session = GameSession.objects.filter(member=member, game=game).latest('start')
             except GameSession.DoesNotExist:
                 pass
             else:
@@ -132,7 +135,7 @@ class Plugin(BasePlugin):
     @command(help='Shows the most popular games in total play time')
     def stat_games(self, command):
         yield from command.send_typing()
-        games = GameSession.objects.filter(duration__isnull=False).values('game').annotate(
+        games = GameSession.objects.filter(duration__isnull=False).values('game__name').annotate(
             time=Sum('duration'),
             num_players=Count('member', distinct=True)
         ).filter(num_players__gt=1).order_by('-time')[:15]

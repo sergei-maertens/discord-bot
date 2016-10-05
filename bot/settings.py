@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     'bot.accounts',
     'bot.channels',
+    'bot.games',
     'bot.users',
 
     'bot.plugins.game_notifications',
