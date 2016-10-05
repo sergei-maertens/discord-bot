@@ -6,10 +6,10 @@ class LoggedMessage(models.Model):
 
     discord_id = models.CharField(max_length=50, unique=True)
 
-    member = models.ForeignKey('users.Member', related_name='messages_authored')
+    member = models.ForeignKey('users.Member', related_name='messages_authored', on_delete=models.PROTECT)
     member_username = models.CharField(max_length=255)  # this can change, only the member.discord_id is a constant
 
-    channel = models.ForeignKey('channels.Channel')
+    channel = models.ForeignKey('channels.Channel', on_delete=models.PROTECT)
 
     content = models.TextField()
     num_lines = models.PositiveSmallIntegerField(default=1)
@@ -28,7 +28,7 @@ class LoggedMessage(models.Model):
 
 
 class GameSession(models.Model):
-    member = models.ForeignKey('users.Member')
+    member = models.ForeignKey('users.Member', on_delete=models.PROTECT)
     game = models.CharField(_('game'), max_length=255)
     start = models.DateTimeField(_('start'))
     stop = models.DateTimeField(_('stop'), null=True, blank=True)
