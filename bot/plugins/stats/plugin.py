@@ -148,6 +148,6 @@ class Plugin(BasePlugin):
                 days=delta.days, hours=hours, minutes=max(1, minutes) if min_minutes else minutes)
 
         data = [
-            (game['game'], format_delta(game['time'])) for game in games
+            (game['game__name'], format_delta(game['time'])) for game in games
         ]
         yield from command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))

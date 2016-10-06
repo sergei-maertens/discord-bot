@@ -39,4 +39,4 @@ class GameSession(models.Model):
         verbose_name_plural = _('game sessions')
 
     def __str__(self):
-        return self.game
+        return self.game.name
