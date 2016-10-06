@@ -29,7 +29,7 @@ class LoggedMessage(models.Model):
 
 class GameSession(models.Model):
     member = models.ForeignKey('users.Member', on_delete=models.PROTECT)
-    game = models.ForeignKey('games.Game', null=True)
+    game = models.ForeignKey('games.Game')
     start = models.DateTimeField(_('start'))
     stop = models.DateTimeField(_('stop'), null=True, blank=True)
     duration = models.DurationField(null=True, blank=True)

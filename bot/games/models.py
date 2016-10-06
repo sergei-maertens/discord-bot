@@ -29,6 +29,10 @@ class Game(models.Model):
     def __str__(self):
         return self.name
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_alias_for_id = self.alias_for_id
+
     def clean(self):
         if self.alias_for and self.alias_for.alias_for:
             raise ValidationError(_("Aliases can only span one level"))
