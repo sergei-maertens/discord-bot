@@ -22,4 +22,4 @@ class ExportTests(TestCase):
         dataset = resource.export(queryset)
         self.assertEqual(dataset.headers, ['game', 'time (hours)', 'num_players'])
         self.assertEqual(dataset[0], ('Battlefield 4', 2, 3))
-        self.assertEqual(dataset[0], ('Overwatch', 1.5, 2))
+        self.assertEqual(dataset[1], ('Overwatch', 1.5, 2))

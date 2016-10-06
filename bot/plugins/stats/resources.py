@@ -9,3 +9,12 @@ class GamesPlayedResource(resources.Resource):
 
     class Meta:
         export_order = ['game', 'time', 'num_players']
+
+    def dehydrate_game(self, obj):
+        return obj['game__name']
+
+    def dehydrate_time(self, obj):
+        return obj['time'].total_seconds() / 3600
+
+    def dehydrate_num_players(self, obj):
+        return obj['num_players']
