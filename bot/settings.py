@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     'bot.accounts',
     'bot.channels',
+    'bot.games',
     'bot.users',
 
     'bot.plugins.game_notifications',
@@ -101,11 +102,6 @@ PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
 
 
 PLUGINS = {
-    'daisy': {
-        'enabled': False,
-        'subreddit': 'DaisyRidley',
-        'useragent': PRAW_USER_AGENT,
-    },
     'log': {
         'enabled': True,
     },
@@ -116,7 +112,7 @@ PLUGINS = {
         'enabled': True,
     },
     'test': {
-        'enabled': False,
+        'enabled': True,
     },
     'system': {
         'enabled': True,
@@ -128,11 +124,17 @@ PLUGINS = {
         'enabled': True,
         'useragent': PRAW_USER_AGENT,
     },
+    'stats': {
+        'enabled': True,
+    },
     'status': {
         'enabled': True,
     }
 }
 
+
+USE_TZ = True
+TIME_ZONE = 'Europe/Amsterdam'
 
 ROOT_URLCONF = 'bot.urls'
 
