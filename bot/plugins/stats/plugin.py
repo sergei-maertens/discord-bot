@@ -172,8 +172,6 @@ class Plugin(BasePlugin):
         else:
             _file = StringIO(export_data)
 
-        logger.debug('writing export data: %s', export_data)
-
         download = Download.objects.create(title='Games playtime')
         filename = '{}.{}'.format(command.command.name, file_format.get_extension())
         download.file.save(filename, File(_file))
