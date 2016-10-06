@@ -1,12 +1,15 @@
 import logging
 import re
+from io import BytesIO, StringIO
 
-from django.db.models import Count, Sum
+from django.core.files import File
+from django.db.models import Count
 from django.utils.timesince import timesince
 from django.utils.timezone import make_aware, now, utc
 
 from discord.enums import Status
 from tabulate import tabulate
+from import_export.admin import DEFAULT_FORMATS
 
 from bot.channels.models import Channel
 from bot.games.models import Game
@@ -14,10 +17,14 @@ from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.models import Member
 
-from .models import LoggedMessage, GameSession
+from .models import Download, LoggedMessage, GameSession
+from .resources import GamesPlayedResource
 
 
 logger = logging.getLogger(__name__)
+
+
+EXPORT_FORMATS = {f().get_title(): f for f in DEFAULT_FORMATS if f().can_export()}
 
 
 class Plugin(BasePlugin):
@@ -149,6 +156,23 @@ class Plugin(BasePlugin):
         ]
         yield from command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
 
-    @command(help='Exports the unformatted games stats to CSV')
+    @command(
+        pattern=re.compile(r'(?P<format>{})?'.format(
+            '|'.join(EXPORT_FORMATS.keys())
+        ), re.IGNORECASE),
+        help='Exports the unformatted games stats to CSV')
     def export_stat_games(self, command):
         yield from command.reply('Generating file...')
+        file_format = EXPORT_FORMATS[command.args.format or 'csv']()
+        resource = GamesPlayedResource()
+        dataset = resource.export(GameSession.objects.get_game_durations())
+        export_data = file_format.export_data(dataset)
+        if file_format.is_binary():
+            _file = BytesIO(export_data)
+        else:
+            _file = StringIO(export_data)
+
+        download = Download.objects.create(title='Games playtime')
+        filename = '{}.{}'.format(command.command.name, file_format.get_extension())
+        download.file.save(filename, File(_file))
+        yield from command.reply('Download the file at {}'.format(download.file.url))

@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urljoin
 
 PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
 
@@ -10,6 +11,9 @@ PASSWORD = os.getenv('PASSWORD') or 'secret'
 OWNER_ID = os.getenv('OWNER_ID')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
+
+SITE_URL = 'http://botbt.xbbtx.be'
+GITHUB_URL = 'https://github.com/sergei-maertens/discord-bot'
 
 LOGGING_CONFIG = 'logging.config.dictConfig'
 LOGGING = {
@@ -144,6 +148,9 @@ AUTH_USER_MODEL = 'accounts.User'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = urljoin(SITE_URL, '/media/')
+
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'botbt.xbbtx.be']
 
@@ -161,7 +168,3 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-
-SITE_URL = 'http://botbt.xbbtx.be'
-GITHUB_URL = 'https://github.com/sergei-maertens/discord-bot'

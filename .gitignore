@@ -12,3 +12,4 @@ __pycache__
 
 # uploads/static
 /static/
+/media/

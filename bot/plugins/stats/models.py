@@ -52,3 +52,16 @@ class GameSession(models.Model):
 
     def __str__(self):
         return self.game.name
+
+
+class Download(models.Model):
+    title = models.CharField(_('title'), max_length=255)
+    file = models.FileField(upload_to='downloads/%Y/%m/')
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('download')
+        verbose_name_plural = _('downloads')
+
+    def __str__(self):
+        return self.title
