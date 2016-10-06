@@ -161,3 +161,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+SITE_URL = 'http://botbt.xbbtx.be'
+GITHUB_URL = 'https://github.com/sergei-maertens/discord-bot'

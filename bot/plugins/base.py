@@ -146,3 +146,7 @@ class BasePlugin(metaclass=BasePluginMeta):
             command.for_message, command.client = message, self.client
             assert asyncio.iscoroutinefunction(handler)
             yield from handler(self, command)
+
+    def on_message_edit(self, before, after):
+        return
+        yield
