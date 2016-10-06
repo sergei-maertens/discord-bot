@@ -135,10 +135,7 @@ class Plugin(BasePlugin):
     @command(help='Shows the most popular games in total play time')
     def stat_games(self, command):
         yield from command.send_typing()
-        games = GameSession.objects.filter(duration__isnull=False).values('game__name').annotate(
-            time=Sum('duration'),
-            num_players=Count('member', distinct=True)
-        ).filter(num_players__gt=1).order_by('-time')[:15]
+        games = GameSession.objects.get_game_durations()[:15]
 
         def format_delta(delta):
             hours, seconds = divmod(delta.seconds, 3600)
@@ -151,3 +148,7 @@ class Plugin(BasePlugin):
             (game['game__name'], format_delta(game['time'])) for game in games
         ]
         yield from command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
+
+    @command(help='Exports the unformatted games stats to CSV')
+    def export_stat_games(self, command):
+        yield from command.reply('Generating file...')
