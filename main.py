@@ -14,6 +14,7 @@ import discord
 
 from django.conf import settings
 from bot.plugins.base import MethodPool
+from bot.plugins.events import EventPool
 
 
 logger = logging.getLogger('bot')
@@ -31,6 +32,7 @@ def main():
     logger.info('Starting up bot')
 
     pool = MethodPool()  # pool that holds all callbacks
+    event_pool = EventPool()
     for plugin, options in settings.PLUGINS.items():
         if not options.get('enabled', True):
             continue
@@ -41,6 +43,7 @@ def main():
         _plugin = import_module(module)
         plugin = _plugin.Plugin(client, options)
         pool.register(plugin)
+        event_pool.register(plugin)
         logger.debug('Configured plugin %r', plugin)
 
     # bind the callback pool

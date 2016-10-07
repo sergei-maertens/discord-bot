@@ -133,6 +133,9 @@ PLUGINS = {
     },
     'status': {
         'enabled': True,
+    },
+    'refuse_command': {
+        'enabled': True,
     }
 }
 
