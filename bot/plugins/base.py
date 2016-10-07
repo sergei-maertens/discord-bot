@@ -152,9 +152,10 @@ class BasePlugin(metaclass=BasePluginMeta):
         if result:
             handler, command = result
             command.for_message, command.client = message, self.client
-            yield from command_resolved.dispatch(command, handler)
-            assert asyncio.iscoroutinefunction(handler)
-            yield from handler(self, command)
+            stop = yield from command_resolved.dispatch(command=command, handler=handler)
+            if not stop:
+                assert asyncio.iscoroutinefunction(handler)
+                yield from handler(self, command)
 
     def on_message_edit(self, before, after):
         return

@@ -1,7 +1,7 @@
 import random
 
 from bot.plugins.base import BasePlugin
-from bot.plugins.events import command_resolved, receiver
+from bot.plugins.events import StopCommandExecution, command_resolved, receiver
 
 
 class Plugin(BasePlugin):
@@ -18,3 +18,4 @@ class Plugin(BasePlugin):
     def refuse_command(self, command, handler):
         msg = random.choice(self.MESSAGES)
         yield from command.reply(msg)
+        raise StopCommandExecution()

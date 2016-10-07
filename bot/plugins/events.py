@@ -10,10 +10,15 @@ class EventPool:
             event.register(*handlers)
 
 
+class EventError(Exception):
+    pass
+
+
 class Event:
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name=None):
+        if name:
+            self.name = name
         self.listeners = []
 
     def __repr__(self):
@@ -26,7 +31,13 @@ class Event:
     @asyncio.coroutine
     def dispatch(self, *args, **kwargs):
         coros = [listener(*args, **kwargs) for listener in self.listeners]
-        yield from asyncio.gather(*coros)
+        results = yield from asyncio.gather(*coros, return_exceptions=True)
+        exceptions = [result for result in results if isinstance(result, Exception)]
+        return self.handle_exceptions(*exceptions)
+
+    def handle_exceptions(self, *exceptions):
+        if exceptions:
+            raise EventError('Got %d unhandled exception(s)' % len(exceptions))
 
 
 def receiver(event):
@@ -38,4 +49,18 @@ def receiver(event):
 
 
 # built in events
-command_resolved = Event('command_resolved')
+class StopCommandExecution(Exception):
+    pass
+
+
+class CommandResolvedEvent(Event):
+    name = 'command_resolved'
+
+    def handle_exceptions(self, *exceptions):
+        unexpected_exceptions = [exc for exc in exceptions if not isinstance(exc, StopCommandExecution)]
+        super().handle_exceptions(*unexpected_exceptions)
+        has_stop_command = len(exceptions) > len(unexpected_exceptions)
+        return has_stop_command
+
+
+command_resolved = CommandResolvedEvent()
