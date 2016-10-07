@@ -4,6 +4,7 @@ import logging
 import re
 
 from . import commands
+from .events import command_resolved
 
 
 logger = logging.getLogger(__name__)
@@ -78,11 +79,14 @@ class BasePluginMeta(type):
         new_cls = super().__new__(mcs, name, bases, attrs)
         new_cls.commands = {}  # required to prevent commands registering with the wrong plugin
         new_cls._callbacks = {}
+        new_cls._event_handlers = {}
 
         # inherit callbacks from parents
         for base in bases:
             if base._callbacks:
                 new_cls._callbacks.update(base._callbacks)
+            if base._event_handlers:
+                new_cls._event_handlers.update(base._event_handlers)
 
         for attr, val in new_cls.__dict__.items():
             # check for direct event handlers
@@ -93,6 +97,10 @@ class BasePluginMeta(type):
             elif callable(val) and hasattr(val, '_command'):
                 cmd = '{0}{1}'.format(commands.PREFIX, val._command.name)
                 new_cls.commands[cmd] = asyncio.coroutine(val)
+
+            elif callable(val) and hasattr(val, '_event'):
+                new_cls._event_handlers.setdefault(val._event, [])
+                new_cls._event_handlers[val._event].append(val)
 
         return new_cls
 
@@ -144,6 +152,7 @@ class BasePlugin(metaclass=BasePluginMeta):
         if result:
             handler, command = result
             command.for_message, command.client = message, self.client
+            yield from command_resolved.dispatch(command, handler)
             assert asyncio.iscoroutinefunction(handler)
             yield from handler(self, command)
 

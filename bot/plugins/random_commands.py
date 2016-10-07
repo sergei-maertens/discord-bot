@@ -12,4 +12,4 @@ class Plugin(BasePlugin):
         Draws an ASCII penis
         """
         length = random.choice(range(3, 15))
-        yield from command.reply('8{length}D'.format(length='='*length))
+        yield from command.reply('8{length}D'.format(length='=' * length))
