@@ -9,7 +9,7 @@ class GameQuerySet(models.QuerySet):
         games = self.filter(
             models.Q(name__iexact=name) | models.Q(game__name__iexact=name),
             alias_for__isnull=True
-        )
+        ).distinct()
         try:
             return games.get()
         except self.model.DoesNotExist:

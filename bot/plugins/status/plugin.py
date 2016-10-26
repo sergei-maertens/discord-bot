@@ -39,11 +39,11 @@ class Plugin(BasePlugin):
                 yield from command.reply('I have no known statuses...')
                 return
         game = Game(name=status)
-        yield from self.client.change_status(game=game, idle=False)
+        yield from self.client.change_presence(game=game)
 
     @command()
     def clear_status(self, command):
-        yield from self.client.change_status(game=None, idle=False)
+        yield from self.client.change_presence(game=None)
 
     @command()
     def list_status(self, command):
