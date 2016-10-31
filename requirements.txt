@@ -7,6 +7,7 @@ pytz==2016.7
 gitpython
 tabulate==0.7.5
 django-import-export==0.5.1
+python-dateutil==2.5.3
 
 uwsgi==2.0.12
 psycopg2==2.6.1

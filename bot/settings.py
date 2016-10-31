@@ -137,6 +137,9 @@ PLUGINS = {
     },
     'refuse_command': {
         'enabled': True,
+    },
+    'remindme': {
+        'enabled': True,
     }
 }
 
