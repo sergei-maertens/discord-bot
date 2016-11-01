@@ -8,6 +8,9 @@ from dateutil.parser import parse
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 
+from bot.users.models import Member
+from .models import Message
+
 
 format_relative = r'(\d{1,2}[a-z]+\ ?)+'  # 5year 3days etc.
 format_absolute = r'((\d{4}-\d{1,2}-\d{1,2})?\ ?(\d{1,2}:\d{1,2})?)'  # YYYY-MM-DD HH:mm
@@ -31,7 +34,9 @@ class Plugin(BasePlugin):
     def remindme(self, command):
         yield from command.send_typing()
         timestamp = self.parse_time(command.args.time)
-        yield from command.reply("At {} - {}".format(timestamp, command.args.message))
+        member = Member.objects.from_message(command.message)
+        Message.objects.create(member=member, text=command.message.content, deliver_at=timestamp)
+        yield from command.reply("Around {}, I will remind you.".format(timestamp))
 
     def parse_time(self, delta_string):
         """
