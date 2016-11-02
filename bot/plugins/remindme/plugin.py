@@ -3,6 +3,7 @@ import re
 
 from discord.utils import find
 from django.utils import timezone
+from django.utils.timesince import timeuntil
 
 import parsedatetime
 from dateutil.parser import parse
@@ -35,10 +36,14 @@ class Plugin(BasePlugin):
              help="Store a message to be reminded of later, e.g. !remindme 2days 4hours do the laundry")
     def remindme(self, command):
         yield from command.send_typing()
-        timestamp = self.parse_time(command.args.time)
+        try:
+            timestamp = self.parse_time(command.args.time)
+        except ValueError:
+            yield from command.reply("Could not parse the time \"{}\"".format(command.args.time))
+            return
         member = Member.objects.from_message(command.message)
         Message.objects.create(member=member, text=command.args.message, deliver_at=timestamp)
-        yield from command.reply("Around {}, I will remind you.".format(timestamp))
+        yield from command.reply("I'll do so in {}".format(timeuntil(timestamp)))
 
     def parse_time(self, delta_string):
         """
