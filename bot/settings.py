@@ -78,6 +78,7 @@ INSTALLED_APPS = [
 
     'bot.plugins.game_notifications',
     'bot.plugins.reddit',
+    'bot.plugins.remindme',
     'bot.plugins.stats',
     'bot.plugins.status',
 ]
@@ -135,6 +136,9 @@ PLUGINS = {
         'enabled': True,
     },
     'refuse_command': {
+        'enabled': True,
+    },
+    'remindme': {
         'enabled': True,
     }
 }

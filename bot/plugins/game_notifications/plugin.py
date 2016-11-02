@@ -100,4 +100,3 @@ class Plugin(BasePlugin):
             )
         msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(_games))
         yield from command.reply(msg)
-
