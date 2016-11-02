@@ -67,12 +67,11 @@ class Plugin(BasePlugin):
         """
         # only connected to one server
         server = next((s for s in self.client.servers))
-        channel = find(lambda c: c.name == 'developer', server.channels)
         while True:
             for message in Message.objects.to_deliver_now():
                 member = find(lambda m: m.id == message.member.discord_id, server.members)
                 msg = "{}: {}".format(member.mention, message.text)
-                yield from self.client.send_message(channel, msg)
+                yield from self.client.send_message(member, msg)
                 message.delivered = True
                 message.save()
             yield from asyncio.sleep(5)
