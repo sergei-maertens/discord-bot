@@ -1,5 +1,7 @@
+import asyncio
 import re
 
+from discord.utils import find
 from django.utils import timezone
 
 import parsedatetime
@@ -35,7 +37,7 @@ class Plugin(BasePlugin):
         yield from command.send_typing()
         timestamp = self.parse_time(command.args.time)
         member = Member.objects.from_message(command.message)
-        Message.objects.create(member=member, text=command.message.content, deliver_at=timestamp)
+        Message.objects.create(member=member, text=command.args.message, deliver_at=timestamp)
         yield from command.reply("Around {}, I will remind you.".format(timestamp))
 
     def parse_time(self, delta_string):
@@ -57,3 +59,20 @@ class Plugin(BasePlugin):
             return dt
         else:
             return parse(delta_string).replace(tzinfo=timezone.utc)
+
+    @asyncio.coroutine
+    def on_ready(self):
+        """
+        Fired when the client is logged in - start the polling loop.
+        """
+        # only connected to one server
+        server = next((s for s in self.client.servers))
+        channel = find(lambda c: c.name == 'developer', server.channels)
+        while True:
+            for message in Message.objects.to_deliver_now():
+                member = find(lambda m: m.id == message.member.discord_id, server.members)
+                msg = "{}: {}".format(member.mention, message.text)
+                yield from self.client.send_message(channel, msg)
+                message.delivered = True
+                message.save()
+            yield from asyncio.sleep(5)
