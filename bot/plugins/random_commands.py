@@ -13,3 +13,7 @@ class Plugin(BasePlugin):
         """
         length = random.choice(range(3, 15))
         yield from command.reply('8{length}D'.format(length='=' * length))
+
+    @command()
+    def benis(self, command):
+        yield from self.penis(command)
