@@ -61,10 +61,11 @@ class Plugin(BasePlugin):
         if not logged_message:
             return
 
-        logged_message.edited_timestamp = make_aware(after.edited_timestamp, utc)
-        logged_message.content = after.content
-        logged_message.num_lines = len(after.content.splitlines())
-        logged_message.save()
+        if after is not None:
+            logged_message.edited_timestamp = make_aware(after.edited_timestamp, utc)
+            logged_message.content = after.content
+            logged_message.num_lines = len(after.content.splitlines())
+            logged_message.save()
 
     def on_member_update(self, before, after):
         if hasattr(super(), 'on_member_update'):

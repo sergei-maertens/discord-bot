@@ -111,6 +111,9 @@ PLUGINS = {
     'log': {
         'enabled': True,
     },
+    'custom_commands': {
+        'enabled': True,
+    },
     'game_notifications': {
         'enabled': True,
     },
