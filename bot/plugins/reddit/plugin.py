@@ -172,6 +172,9 @@ class Plugin(BasePlugin):
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
         seen = self._subreddit_cache[subreddit.display_name]['seen']
         submissions = [s for s in subreddit.get_hot(limit=50) if s.id not in seen]
+        if not submissions:
+            yield from command.reply('Couldn\'t find suitable submissions... :( ')
+            return
         submission = random.choice(submissions)
         seen.add(submission.id)
 
