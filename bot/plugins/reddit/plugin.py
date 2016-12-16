@@ -27,6 +27,7 @@ class Plugin(BasePlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._subreddit_cache = {}
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
     def get_nsfw_allowed(self, command):
@@ -147,9 +148,17 @@ class Plugin(BasePlugin):
 
         yield from command.send_typing()
         subreddit = self.reddit_bot.get_subreddit(reddit_cmd.subreddit)
+
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
         submissions = [s for s in subreddit.get_hot(limit=50)]
         submission = random.choice(submissions)
         logger.debug('Picked a submission')
-        yield from command.reply(submission.url)
+        if submission.over_18 and not allow_nsfw:
+            yield from command.reply('NSFW content is not allowed here')
+        else:
+            yield from command.reply("**{}**".format(submission.title))
+            if not submission.selftext and submission.url:
+                yield from command.reply(submission.url)
+            else:
+                yield from command.reply(submission.selftext)
         logger.debug('Sent message')
