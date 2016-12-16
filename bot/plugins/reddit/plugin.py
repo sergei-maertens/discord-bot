@@ -139,7 +139,27 @@ class Plugin(BasePlugin):
             reddit_cmd.times_used = F('times_used') + 1
             reddit_cmd.save()
         except RedditCommand.DoesNotExist:
-            return
+            # test if it's a subreddit after all
+            if cmd not in self._subreddit_cache:
+                subreddit = self.reddit_bot.get_subreddit(cmd)
+                try:
+                    subreddit.id
+                except (praw.errors.InvalidSubreddit, praw.errors.NotFound):
+                    self._subreddit_cache[cmd] = None
+                    return
+                else:  # it exists
+                    reddit_cmd = RedditCommand.objects.create(command=cmd, nsfw=subreddit.over18, times_used=1)
+            elif self._subreddit_cache[cmd] is None:
+                return
+            else:
+                logger.error('errr?')
+                return
+
+        if cmd not in self._subreddit_cache:
+            self._subreddit_cache[cmd] = {
+                'seen': set(),
+                'sr': self.reddit_bot.get_subreddit(cmd)
+            }
 
         allow_nsfw = self.get_nsfw_allowed(command)
         if reddit_cmd.nsfw and not allow_nsfw:
@@ -147,14 +167,17 @@ class Plugin(BasePlugin):
             return
 
         yield from command.send_typing()
-        subreddit = self.reddit_bot.get_subreddit(reddit_cmd.subreddit)
+        subreddit = self._subreddit_cache[cmd]['sr']
 
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
-        submissions = [s for s in subreddit.get_hot(limit=50)]
+        seen = self._subreddit_cache[subreddit.display_name]['seen']
+        submissions = [s for s in subreddit.get_hot(limit=50) if s.id not in seen]
         submission = random.choice(submissions)
+        seen.add(submission.id)
+
         logger.debug('Picked a submission')
         if submission.over_18 and not allow_nsfw:
-            yield from command.reply('NSFW content is not allowed here')
+            yield from command.reply('*NSFW posts are not allowed here, not displaying it.*')
         else:
             yield from command.reply("**{}**".format(submission.title))
             if not submission.selftext and submission.url:

@@ -10,6 +10,10 @@ from bot.plugins.commands import command
 class Plugin(BasePlugin):
 
     @command()
+    def ping(self, command):
+        yield from command.reply('pong')
+
+    @command()
     def penis(self, command):
         """
         Draws an ASCII penis
