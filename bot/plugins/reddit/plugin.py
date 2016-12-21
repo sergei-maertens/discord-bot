@@ -139,26 +139,34 @@ class Plugin(BasePlugin):
             reddit_cmd.times_used = F('times_used') + 1
             reddit_cmd.save()
         except RedditCommand.DoesNotExist:
+            if cmd.startswith('r/'):
+                sr = cmd[2:]
+            elif cmd.startswith('/r/'):
+                sr = cmd[3:]
+            else:
+                return
             # test if it's a subreddit after all
-            if cmd not in self._subreddit_cache:
-                subreddit = self.reddit_bot.get_subreddit(cmd)
+            if sr not in self._subreddit_cache:
+                subreddit = self.reddit_bot.get_subreddit(sr)
                 try:
                     subreddit.id
                 except (praw.errors.InvalidSubreddit, praw.errors.NotFound):
-                    self._subreddit_cache[cmd] = None
+                    self._subreddit_cache[sr] = None
                     return
                 else:  # it exists
-                    reddit_cmd = RedditCommand.objects.create(command=cmd, nsfw=subreddit.over18, times_used=1)
-            elif self._subreddit_cache[cmd] is None:
+                    reddit_cmd = RedditCommand.objects.create(
+                        command=cmd, subreddit=sr,
+                        nsfw=subreddit.over18, times_used=1)
+            elif self._subreddit_cache[sr] is None:
                 return
             else:
                 logger.error('errr?')
                 return
 
-        if cmd not in self._subreddit_cache:
-            self._subreddit_cache[cmd] = {
+        if reddit_cmd.subreddit not in self._subreddit_cache:
+            self._subreddit_cache[reddit_cmd.subreddit] = {
                 'seen': set(),
-                'sr': self.reddit_bot.get_subreddit(cmd)
+                'sr': self.reddit_bot.get_subreddit(reddit_cmd.subreddit)
             }
 
         allow_nsfw = self.get_nsfw_allowed(command)
@@ -167,7 +175,7 @@ class Plugin(BasePlugin):
             return
 
         yield from command.send_typing()
-        subreddit = self._subreddit_cache[cmd]['sr']
+        subreddit = self._subreddit_cache[reddit_cmd.subreddit]['sr']
 
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
         seen = self._subreddit_cache[subreddit.display_name]['seen']
