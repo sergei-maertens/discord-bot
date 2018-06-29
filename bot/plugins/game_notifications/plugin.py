@@ -98,5 +98,5 @@ class Plugin(BasePlugin):
             _games.append(
                 '{name}{muted}'.format(name=game['game_name'], muted=' (muted)' if game['muted'] else '')
             )
-        msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(_games))
+        msg = 'You\'re subscribed to: {games}'.format(games=', '.join(_games))
         yield from command.reply(msg)
