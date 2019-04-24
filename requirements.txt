@@ -10,5 +10,5 @@ django-import-export==0.5.1
 python-dateutil==2.5.3
 parsedatetime==2.1
 
-uwsgi==2.0.14
-psycopg2==2.6.1
+uwsgi==2.0.18
+psycopg2==2.8.2

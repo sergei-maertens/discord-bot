@@ -1,0 +1,26 @@
+---
+
+- name: Deploy discord-bot
+  hosts: all
+  remote_user: root
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+    - name: Ensure main container runs
+      docker_container:
+        name: botbt
+        image: sergeimaykin/discord-bot:latest
+        hostname: botbt
+        state: started
+        restart: no
+        restart_policy: always
+        env:
+          TOKEN: "{{ token }}"
+          OWNER_ID: "{{ owner_id }}"
+          SECRET_KEY: "{{ secret_key }}"
+          DB_HOST: "{{ db.host }}"
+          DB_NAME: "{{ db.name }}"
+          DB_PASSWORD: "{{ db.password }}"

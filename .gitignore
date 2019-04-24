@@ -9,6 +9,9 @@ __pycache__
 # logging
 *.log
 
+# secrets
+.env
+.vault_password.txt
 
 # uploads/static
 /static/
