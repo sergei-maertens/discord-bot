@@ -9,6 +9,9 @@ __pycache__
 # logging
 *.log
 
+# deploy
+*.retry
+
 # secrets
 .env
 .vault_password.txt
