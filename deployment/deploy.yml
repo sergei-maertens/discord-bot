@@ -7,7 +7,14 @@
   vars_files:
     - vars.yml
 
-  tasks:
+  vars:
+    pip_install_packages:
+      - name: docker
+
+  roles:
+    - geerlingguy.docker
+
+  post_tasks:
 
     - name: Ensure main container runs
       docker_container:

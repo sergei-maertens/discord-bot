@@ -20,7 +20,7 @@ done
 
 # Apply database migrations
 >&2 echo "Apply database migrations"
-python src/manage.py migrate
+python manage.py migrate
 
 # Start server
 >&2 echo "Starting server"
