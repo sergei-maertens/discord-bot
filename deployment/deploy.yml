@@ -6,14 +6,38 @@
   vars_files:
     - vars.yml
 
-  vars:
-    pip_install_packages:
-      - name: docker
-
   roles:
     - geerlingguy.docker
 
-  post_tasks:
+  tasks:
+
+    - name: Ensure docker package is available
+      pip:
+        name: docker
+        state: present
+
+    - name: Ensure a separate network exists
+      docker_network:
+        name: botbt
+
+    - name: Ensure a database volume exists
+      docker_volume:
+        name: botbt-db
+
+    - name: Ensure PostgreSQL container runs
+      docker_container:
+        name: botbt-db
+        image: postgres:11-alpine
+        hostname: botbt-db
+        state: started
+        restart: no
+        restart_policy: always
+        networks:
+          - name: botbt
+        volumes:
+          - botbt-db:/var/lib/postgresql/data
+        env:
+          POSTGRES_PASSWORD: "{{ db.password }}"
 
     - name: Ensure main container runs
       docker_container:
@@ -23,11 +47,13 @@
         state: started
         restart: no
         restart_policy: always
+        networks:
+          - name: botbt
         env:
           TOKEN: "{{ token }}"
           OWNER_ID: "{{ owner_id }}"
           SECRET_KEY: "{{ secret_key }}"
-          DB_HOST: "{{ db.host }}"
-          DB_NAME: "{{ db.name }}"
-          DB_USER: "{{ db.user }}"
+          DB_HOST: "botbt-db"
+          DB_NAME: "postgres"
+          DB_USER: "postgres"
           DB_PASSWORD: "{{ db.password }}"
