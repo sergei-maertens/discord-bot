@@ -27,7 +27,7 @@ class PluginTests(TestCase):
     def test_parse_absolute(self):
         plugin = Plugin(mock.MagicMock(), {})
 
-        now = timezone.now()
+        now = datetime.now()
 
         self.assertEqual(
             plugin.parse_time('21:00'),

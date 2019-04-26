@@ -6,15 +6,6 @@ RUN apk --no-cache add \
     pcre-dev \
     linux-headers \
     postgresql-dev
-    # python3-dev
-    # libraries installed using git
-    # git \
-    # lxml dependencies
-    # libxslt-dev \
-    # pillow dependencies
-    # jpeg-dev \
-    # openjpeg-dev \
-    # zlib-dev
 
 WORKDIR /app
 
@@ -30,15 +21,7 @@ RUN apk --no-cache add \
     mailcap \
     musl \
     pcre \
-    postgresql \
-    git
-    # lxml dependencies
-    # libxslt \
-    # pillow dependencies
-    # jpeg \
-    # openjpeg \
-    # zlib \
-    # nodejs
+    postgresql
 
 COPY --from=build /usr/local/lib/python3.6 /usr/local/lib/python3.6
 COPY --from=build /usr/local/bin/uwsgi /usr/local/bin/uwsgi

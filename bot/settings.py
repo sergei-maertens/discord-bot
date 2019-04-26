@@ -12,7 +12,7 @@ OWNER_ID = os.getenv('OWNER_ID')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
 
-SITE_URL = 'http://botbt.xbbtx.be'
+SITE_URL = 'https://botbt.xbbtx.be'
 GITHUB_URL = 'https://github.com/sergei-maertens/discord-bot'
 
 LOGGING_CONFIG = 'logging.config.dictConfig'
