@@ -6,6 +6,10 @@
   vars_files:
     - vars.yml
 
+  vars:
+    - image: sergeimaykin/discord-bot:latest
+    - port: 8010
+
   roles:
     - geerlingguy.docker
 
@@ -41,8 +45,9 @@
 
     - name: Ensure main container runs
       docker_container:
-        name: botbt
-        image: sergeimaykin/discord-bot:latest
+        name: botbt-main
+        image: "{{ image }}"
+        pull: yes
         hostname: botbt
         state: started
         restart: no
@@ -57,3 +62,26 @@
           DB_NAME: "postgres"
           DB_USER: "postgres"
           DB_PASSWORD: "{{ db.password }}"
+
+    - name: Ensure web container runs
+      docker_container:
+        name: botbt-web
+        image: "{{ image }}"
+        pull: yes
+        hostname: botbt
+        state: started
+        restart: no
+        restart_policy: always
+        networks:
+          - name: botbt
+        env:
+          TOKEN: "{{ token }}"
+          OWNER_ID: "{{ owner_id }}"
+          SECRET_KEY: "{{ secret_key }}"
+          DB_HOST: "botbt-db"
+          DB_NAME: "postgres"
+          DB_USER: "postgres"
+          DB_PASSWORD: "{{ db.password }}"
+        published_ports:
+          - "127.0.0.1:{{ port }}:8000"
+        command: /uwsgi.sh
