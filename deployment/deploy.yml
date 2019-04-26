@@ -11,6 +11,27 @@
     web_port: 8010
     hostname: botbt.xbbtx.be
     nginx_log_dir: /var/log/nginx/botbt
+    pubkey: >
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCq/gAKXz6C2zzYcnjs9BUnyry8h+bSAy3/3
+      w6e1dgZx+ZoY1ZoAi7KcREMkG4M6SJ1AbQVezCX0yntoQ9gZz8uRNwT3pFUsvfWAKIvRrdEd5
+      nutglcB9bCn1AL+EeKirrBATZjePES+F2Do82HmIX7Y3urynU0cHi9j76ZPAoxgmeN7ZJdsVC
+      6zek6VQDW+ExwUKMEeHU8QQge5IQjiyGGERXUjCcnfeOw0rytkN4ARrz34cmkx9gqI5DzK9eb
+      hMmB5/UQHzg+bk+yhPemcYpbN/OyA92Oua7qasucWEo4AZ/bxOLDEIR2M5LDglFmJkCdBnWvk
+      C5NXZ7Ol/XESbI3 bbt@sergei-arch-2016-11-21
+
+  pre_tasks:
+
+    # Users
+
+    - name: Create the local user
+      user:
+        name: botbt
+        shell: /bin/bash
+
+    - name: Allow ssh login
+      authorized_key:
+        user: botbt
+        key: "{{ pubkey }}"
 
   roles:
     - geerlingguy.docker
