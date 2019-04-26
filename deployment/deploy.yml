@@ -35,6 +35,7 @@
 
   roles:
     - geerlingguy.docker
+    - geerlingguy.certbot
 
   tasks:
 
