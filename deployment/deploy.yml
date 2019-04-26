@@ -7,13 +7,17 @@
     - vars.yml
 
   vars:
-    - image: sergeimaykin/discord-bot:latest
-    - port: 8010
+    image: sergeimaykin/discord-bot:latest
+    port: 8010
+    hostname: botbt.xbbtx.be
+    nginx_log_dir: /var/log/nginx/botbt
 
   roles:
     - geerlingguy.docker
 
   tasks:
+
+    # Docker
 
     - name: Ensure docker package is available
       pip:
@@ -85,3 +89,36 @@
         published_ports:
           - "127.0.0.1:{{ port }}:8000"
         command: /uwsgi.sh
+
+    # Nginx
+
+    - name: Ensure nginx is installed
+      package:
+        name: nginx
+        state: present
+
+    - name: Ensure log dir exists
+      file:
+        path: "{{ nginx_log_dir }}"
+        state: directory
+
+    - name: Install nginx config
+      template:
+        src: botbt.conf
+        dest: /etc/nginx/sites-available/botbt.conf
+      notify:
+        - reload nginx
+
+    - name: Enable vhost
+      file:
+        src: /etc/nginx/sites-available/botbt.conf
+        dest: /etc/nginx/sites-enabled/botbt.conf
+        state: link
+      notify:
+        - reload nginx
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
