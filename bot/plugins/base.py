@@ -47,18 +47,18 @@ class MethodPool(dict):
         default a thread pool), while real coroutines are just executed as-is.
         """
 
-        def grouped(*args, **kwargs):
+        async def grouped(*args, **kwargs):
             coros = []
             for handler in handlers:
                 if handler._has_blocking_io:
                     loop = self.client.loop
                     future = loop.run_in_executor(None, functools.partial(handler, *args, **kwargs))
-                    coro = yield from future
+                    coro = await future
                     coros.append(coro)
                 else:
                     handler = asyncio.coroutine(handler)(*args, **kwargs)  # real coroutine can be called
                     coros.append(handler)
-            yield from asyncio.gather(*coros)
+            await asyncio.gather(*coros)
         return grouped
 
     def bind_to(self, client):
@@ -147,15 +147,15 @@ class BasePlugin(metaclass=BasePluginMeta):
                 return handler, command
         return None
 
-    def on_message(self, message):
+    async def on_message(self, message):
         result = self.get_command(message.content)
         if result:
             handler, command = result
             command.for_message, command.client = message, self.client
-            stop = yield from command_resolved.dispatch(command=command, handler=handler)
+            stop = await command_resolved.dispatch(command=command, handler=handler)
             if not stop:
                 assert asyncio.iscoroutinefunction(handler)
-                yield from handler(self, command)
+                await handler(self, command)
 
     def on_message_edit(self, before, after):
         return

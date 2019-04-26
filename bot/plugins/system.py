@@ -28,7 +28,7 @@ class Plugin(BasePlugin):
 
     @command()
     @bot_admin_required
-    def restart(self, command):
+    async def restart(self, command):
         """
         Restarts the bot.
 
@@ -40,12 +40,12 @@ class Plugin(BasePlugin):
         """
         author_id = command.message.author.id
         logger.info('Restart issued by %s, with ID %s', command.message.author.name, author_id)
-        yield from command.send_typing()
-        yield from command.reply('Restarting...')
+        await command.send_typing()
+        await command.reply('Restarting...')
         raise KeyboardInterrupt
 
     @command()
-    def sysinfo(self, command):
+    async def sysinfo(self, command):
         """
         Shows system/bot information
         """
@@ -59,20 +59,20 @@ class Plugin(BasePlugin):
             f"OS: `{platform.system()}, {platform.release()}`\n"
             f"{settings.SITE_URL}, \n{settings.GITHUB_URL}\n"
         )
-        yield from command.reply(msg)
+        await command.reply(msg)
 
     @command()
     @bot_admin_required
-    def migrate(self, command):
+    async def migrate(self, command):
         """
         Migrates the database forward
         """
         out = StringIO()
         call_command('migrate', interactive=False, no_color=True, stdout=out)
         out.seek(0)
-        yield from command.reply(out.read())
+        await command.reply(out.read())
 
     @command(help="Shows your discord user id")
-    def discord_id(self, command):
+    async def discord_id(self, command):
         member = command.message.author
-        yield from command.reply('{0.mention}: {0.id}'.format(member))
+        await command.reply('{0.mention}: {0.id}'.format(member))

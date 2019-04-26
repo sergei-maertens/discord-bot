@@ -27,28 +27,28 @@ class Plugin(BasePlugin):
     ]
 
     @receiver(command_resolved)
-    def refuse_command(self, command, handler):
+    async def refuse_command(self, command, handler):
         if random.random() < self.PROBABILITY and command.command.name not in self.IGNORE_COMMANDS:
             msg = random.choice(self.MESSAGES)
-            yield from command.reply(msg)
+            await command.reply(msg)
             raise StopCommandExecution()
 
     @command(pattern=re.compile(r'(?P<prob>0\.[\d]+)'))
-    def set_probability(self, command):
+    async def set_probability(self, command):
         self.PROBABILITY = float(command.args.prob)
         yield
 
     @command()
-    def show_probability(self, command):
-        yield from command.reply("It's {0:.2%} likely that I'll refuse commands".format(self.PROBABILITY))
+    async def show_probability(self, command):
+        await command.reply("It's {0:.2%} likely that I'll refuse commands".format(self.PROBABILITY))
 
     @command()
     @bot_admin_required
-    def reset_probability(self, command):
+    async def reset_probability(self, command):
         self.PROBABILITY = BASE_PROBABILITY
-        yield from command.reply("Reset mutiny likelikehood to {0:.2%}".format(self.PROBABILITY))
+        await command.reply("Reset mutiny likelikehood to {0:.2%}".format(self.PROBABILITY))
 
     @command(pattern=re.compile(r'(?P<message>[\w\.!?,@<> ]+)'))
-    def add_mutiny_message(self, command):
+    async def add_mutiny_message(self, command):
         self.MESSAGES.append(command.args.message)
-        yield from command.reply("Added `{}`".format(command.args.message))
+        await command.reply("Added `{}`".format(command.args.message))

@@ -64,11 +64,9 @@ class Command(object):
     def message(self):
         return self.for_message
 
-    @asyncio.coroutine
-    def send_typing(self, dest=None):
-        yield from self.client.send_typing(dest or self.for_message.channel)
+    async def send_typing(self, dest=None):
+        await self.client.send_typing(dest or self.for_message.channel)
 
-    @asyncio.coroutine
-    def reply(self, text):
+    async def reply(self, text):
         channel = self.for_message.channel
-        yield from self.client.send_message(channel, text)
+        await self.client.send_message(channel, text)

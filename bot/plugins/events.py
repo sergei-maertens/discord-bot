@@ -28,10 +28,9 @@ class Event:
         for handler in handlers:
             self.listeners.append(asyncio.coroutine(handler))
 
-    @asyncio.coroutine
-    def dispatch(self, *args, **kwargs):
+    async def dispatch(self, *args, **kwargs):
         coros = [listener(*args, **kwargs) for listener in self.listeners]
-        results = yield from asyncio.gather(*coros, return_exceptions=True)
+        results = await asyncio.gather(*coros, return_exceptions=True)
         exceptions = [result for result in results if isinstance(result, Exception)]
         return self.handle_exceptions(*exceptions)
 
@@ -42,7 +41,6 @@ class Event:
 
 def receiver(event):
     def decorator(callback):
-        # coro = asyncio.coroutine(callback)
         callback._event = event
         return callback
     return decorator

@@ -50,40 +50,40 @@ class Plugin(BasePlugin):
         pattern=re.compile(r'!?(?P<cmd>.*): (?P<subreddit>.*)', re.IGNORECASE),
         help='Configure a command to show a subreddit submission'
     )
-    def add_subreddit(self, command):
+    async def add_subreddit(self, command):
         cmd, subreddit = command.args.cmd, command.args.subreddit
 
         try:
             sr = self.reddit_bot.get_subreddit(subreddit)
             nsfw = sr.over18
         except praw.errors.InvalidSubreddit:
-            yield from command.reply('Subreddit `{}` does not exist'.format(subreddit))
+            await command.reply('Subreddit `{}` does not exist'.format(subreddit))
             return
 
         reddit_cmd, created = RedditCommand.objects.get_or_create(
             command=cmd, defaults={'subreddit': subreddit, 'nsfw': nsfw}
         )
         tpl = 'Added %r' if created else 'Command already exists: %r'
-        yield from command.reply(tpl % reddit_cmd)
+        await command.reply(tpl % reddit_cmd)
 
     @command(
         pattern=re.compile(r'(?P<subreddit>[\w]+)', re.IGNORECASE),
         help='Mark a subreddit as NSFW. Specify the **subreddit** without the /r/, not the command.'
     )
     @command_passes_test(reddit_admin)
-    def mark_nsfw(self, command):
+    async def mark_nsfw(self, command):
         sr = command.args.subreddit
         rc = RedditCommand.objects.filter(subreddit=sr, nsfw=False)
         if not rc.exists():
-            yield from command.reply('No command configured for {sr}'.format(sr=sr))
+            await command.reply('No command configured for {sr}'.format(sr=sr))
             return
 
         updated = rc.update(nsfw=True)
-        yield from command.reply('Marked **{sr}** as NSFW (affected {n} command(s))'.format(sr=sr, n=updated))
+        await command.reply('Marked **{sr}** as NSFW (affected {n} command(s))'.format(sr=sr, n=updated))
 
     @command(help='Mark this channel as NSFW allowed.')
     @command_passes_test(reddit_admin)
-    def allow_nsfw(self, command):
+    async def allow_nsfw(self, command):
         discord_channel = command.message.channel
         if discord_channel.is_private:
             return
@@ -92,14 +92,14 @@ class Plugin(BasePlugin):
             discord_id=discord_channel.id,
             defaults={'name': discord_channel.name})
         if channel.allow_nsfw:
-            yield from command.reply('Channel already allowed NSFW')
+            await command.reply('Channel already allowed NSFW')
             return
         channel.allow_nsfw = True
         channel.save()
-        yield from command.reply('NSFW is now allowed')
+        await command.reply('NSFW is now allowed')
 
     @command(help='Lists the command to fetch submissions from a subreddit')
-    def list_subreddits(self, command):
+    async def list_subreddits(self, command):
         i = 0
         buffer_ = []
 
@@ -118,14 +118,14 @@ class Plugin(BasePlugin):
             buffer_.append(line)
 
             if len(buffer_) % 10 == 0:
-                yield from command.reply("\n".join(buffer_))
+                await command.reply("\n".join(buffer_))
                 buffer_ = []
 
         if len(buffer_):
-            yield from command.reply("\n".join(buffer_))
+            await command.reply("\n".join(buffer_))
 
-    def on_message(self, message):
-        yield from super().on_message(message)
+    async def on_message(self, message):
+        await super().on_message(message)
 
         if not message.content.startswith(PREFIX):
             return
@@ -171,28 +171,28 @@ class Plugin(BasePlugin):
 
         allow_nsfw = self.get_nsfw_allowed(command)
         if reddit_cmd.nsfw and not allow_nsfw:
-            yield from command.reply('No NSFW commands allowed here')
+            await command.reply('No NSFW commands allowed here')
             return
 
-        yield from command.send_typing()
+        await command.send_typing()
         subreddit = self._subreddit_cache[reddit_cmd.subreddit]['sr']
 
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
         seen = self._subreddit_cache[subreddit.display_name]['seen']
         submissions = [s for s in subreddit.get_hot(limit=50) if s.id not in seen]
         if not submissions:
-            yield from command.reply('Couldn\'t find suitable submissions... :( ')
+            await command.reply('Couldn\'t find suitable submissions... :( ')
             return
         submission = random.choice(submissions)
         seen.add(submission.id)
 
         logger.debug('Picked a submission')
         if submission.over_18 and not allow_nsfw:
-            yield from command.reply('*NSFW posts are not allowed here, not displaying it.*')
+            await command.reply('*NSFW posts are not allowed here, not displaying it.*')
         else:
-            yield from command.reply("**{}**".format(submission.title))
+            await command.reply("**{}**".format(submission.title))
             if not submission.selftext and submission.url:
-                yield from command.reply(submission.url)
+                await command.reply(submission.url)
             else:
-                yield from command.reply(submission.selftext)
+                await command.reply(submission.selftext)
         logger.debug('Sent message')

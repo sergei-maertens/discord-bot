@@ -20,8 +20,8 @@ class Plugin(BasePlugin):
         gaming = member.game and settings.DEBUG is False
         return member.status in statuses and not member.is_afk and not gaming
 
-    def on_message(self, message):
-        yield from super().on_message(message)
+    async def on_message(self, message):
+        await super().on_message(message)
 
         if not message.content.startswith(PREFIX):
             return
@@ -33,5 +33,5 @@ class Plugin(BasePlugin):
         # try to match a command and fetch an action
         action = CommandAction.objects.filter(command__command__iexact=cmd).order_by('?').first()
         if action:
-            yield from command.send_typing()
-            yield from command.reply(action.action)
+            await command.send_typing()
+            await command.reply(action.action)

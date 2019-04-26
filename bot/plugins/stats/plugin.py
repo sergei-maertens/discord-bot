@@ -31,11 +31,11 @@ class Plugin(BasePlugin):
 
     has_blocking_io = True
 
-    def on_message(self, message):
+    async def on_message(self, message):
         """
         Log the message in the db
         """
-        yield from super().on_message(message)
+        await super().on_message(message)
 
         if message.channel.is_private:
             return
@@ -54,8 +54,8 @@ class Plugin(BasePlugin):
         if message.mentions:
             logged_message.mentions = Member.objects.from_mentions(message.mentions)
 
-    def on_message_edit(self, before, after):
-        yield from super().on_message_edit(before, after)
+    async def on_message_edit(self, before, after):
+        await super().on_message_edit(before, after)
 
         logged_message = LoggedMessage.objects.filter(discord_id=before.id).first()
         if not logged_message:
@@ -68,9 +68,9 @@ class Plugin(BasePlugin):
             logged_message.num_lines = len(after.content.splitlines())
             logged_message.save()
 
-    def on_member_update(self, before, after):
+    async def on_member_update(self, before, after):
         if hasattr(super(), 'on_member_update'):
-            yield from super().on_member_update(before, after)
+            await super().on_member_update(before, after)
 
         member = Member.objects.from_discord(after)
 
@@ -98,19 +98,19 @@ class Plugin(BasePlugin):
                 session.save()
 
     @command(help='Show the top 10 posters')
-    def stat_messages(self, command):
-        yield from command.send_typing()
+    async def stat_messages(self, command):
+        await command.send_typing()
         queryset = Member.objects.exclude(is_bot=True).annotate(num_messages=Count('messages_authored'))
         top_10 = queryset.order_by('-num_messages')[:10]
         data = [(member.name or str(member), member.num_messages) for member in top_10]
         output = tabulate(data, headers=('User', 'Messages'))
-        yield from command.reply("```\n{}\n```".format(output))
+        await command.reply("```\n{}\n```".format(output))
 
     @command(pattern=re.compile(r'(?P<name>.*)', re.IGNORECASE))
-    def seen(self, command):
+    async def seen(self, command):
         if command.message.mentions:
             if len(command.message.mentions) > 1:
-                yield from command.reply('Supply one user at a time')
+                await command.reply('Supply one user at a time')
                 return
             d_member = command.message.mentions[0]
             member = Member.objects.filter(discord_id=d_member.id).first()
@@ -122,14 +122,14 @@ class Plugin(BasePlugin):
             d_member = next((m for m in all_members if m.name.lower() == username.lower()), None)
 
         if d_member and d_member.status == Status.online:
-            yield from command.reply('{} is currently online'.format(d_member.name))
+            await command.reply('{} is currently online'.format(d_member.name))
             if member:
                 member.last_seen = now()
                 member.save()
             return
 
         if not member or not member.last_seen:
-            yield from command.reply('Haven\'t seen {} (yet)'.format(username))
+            await command.reply('Haven\'t seen {} (yet)'.format(username))
             return
 
         if member:
@@ -139,11 +139,11 @@ class Plugin(BasePlugin):
                 last_seen=timesince(member.last_seen)
             )
             reply2 = "The last message was: ```{message}```".format(message=last_message.content)
-            yield from command.reply("{}\n{}".format(reply1, reply2))
+            await command.reply("{}\n{}".format(reply1, reply2))
 
     @command(help='Shows the most popular games in total play time')
-    def stat_games(self, command):
-        yield from command.send_typing()
+    async def stat_games(self, command):
+        await command.send_typing()
         games = GameSession.objects.get_game_durations()[:15]
 
         def format_delta(delta):
@@ -156,15 +156,15 @@ class Plugin(BasePlugin):
         data = [
             (game['game__name'], format_delta(game['time'])) for game in games
         ]
-        yield from command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
+        await command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
 
     @command(
         pattern=re.compile(r'(?P<format>{})?'.format(
             '|'.join(EXPORT_FORMATS.keys())
         ), re.IGNORECASE),
         help='Exports the unformatted games stats to CSV')
-    def export_stat_games(self, command):
-        yield from command.reply('Generating file...')
+    async def export_stat_games(self, command):
+        await command.reply('Generating file...')
         file_format = EXPORT_FORMATS[command.args.format or 'csv']()
         resource = GamesPlayedResource()
         dataset = resource.export(GameSession.objects.get_game_durations())
@@ -177,4 +177,4 @@ class Plugin(BasePlugin):
         download = Download.objects.create(title='Games playtime')
         filename = '{}.{}'.format(command.command.name, file_format.get_extension())
         download.file.save(filename, File(_file))
-        yield from command.reply('Download the file at {}'.format(download.file.url))
+        await command.reply('Download the file at {}'.format(download.file.url))

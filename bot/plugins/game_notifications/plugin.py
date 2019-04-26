@@ -27,7 +27,7 @@ class Plugin(BasePlugin):
         gaming = member.game and settings.DEBUG is False
         return member.status in statuses and not member.is_afk and not gaming
 
-    def on_member_update(self, before, after):
+    async def on_member_update(self, before, after):
         if not after.game:
             return
 
@@ -52,10 +52,10 @@ class Plugin(BasePlugin):
         msg = '{name} started playing {game}'.format(name=member.name, game=game)
         for member in members:
             logger.info('Notifying %s for %s', member.name, game)
-            yield from self.client.send_message(member, msg)
+            await self.client.send_message(member, msg)
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def subscribe(self, command):
+    async def subscribe(self, command):
         """
         Sets up notifications for <game>
         """
@@ -63,10 +63,10 @@ class Plugin(BasePlugin):
         game = command.args.game
         notification, created = GameNotification.objects.get_or_create(game_name=game.lower(), user=user)
         msg = 'Subscribed you to {game}' if created else 'You were already subscribed to {game}'
-        yield from command.reply(msg.format(game=game))
+        await command.reply(msg.format(game=game))
 
     @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def unsubscribe(self, command):
+    async def unsubscribe(self, command):
         """
         Removes notification subscription for <game>
         """
@@ -74,19 +74,19 @@ class Plugin(BasePlugin):
         game = command.args.game
         deleted, _ = GameNotification.objects.filter(user=user, game_name__iexact=game).delete()
         if deleted:
-            yield from command.reply('Unsubscribed you from {game}'.format(game=game))
+            await command.reply('Unsubscribed you from {game}'.format(game=game))
 
     @command('unsubscribe !all')
-    def unsubscribe_all(self, command):
+    async def unsubscribe_all(self, command):
         """
         Removes all notifications subscriptions
         """
         user = command.message.author.id
         deleted, _ = GameNotification.objects.filter(user=user).delete()
-        yield from command.reply('Unsubscribed you from {num} games'.format(num=deleted))
+        await command.reply('Unsubscribed you from {num} games'.format(num=deleted))
 
     @command()
-    def list(self, command):
+    async def list(self, command):
         """
         Lists the current notification subscriptions
         """
@@ -99,4 +99,4 @@ class Plugin(BasePlugin):
                 '{name}{muted}'.format(name=game['game_name'], muted=' (muted)' if game['muted'] else '')
             )
         msg = 'You\'re subscribed to: {games}'.format(games=', '.join(_games))
-        yield from command.reply(msg)
+        await command.reply(msg)

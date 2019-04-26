@@ -35,7 +35,7 @@ class Plugin(BasePlugin):
         return [module_to_plugin_name(mod) for mod in enabled]
 
     @command()
-    def help(self, command):
+    async def help(self, command):
         help_messages = []
         for module, plugin in self.client._method_pool.plugin_modules.items():
             if plugin is self:  # TODO: FIXME
@@ -50,10 +50,10 @@ class Plugin(BasePlugin):
             ] + msgs + ['']
 
         msg = '\n'.join(help_messages)
-        yield from command.reply(msg)
+        await command.reply(msg)
 
     @command()
-    def list_plugins(self, command):
+    async def list_plugins(self, command):
         all_plugins = set(settings.PLUGINS)
         enabled = set(self.plugins)
         disabled = all_plugins ^ enabled
@@ -61,4 +61,4 @@ class Plugin(BasePlugin):
         msg = 'Enabled plugins: `{enabled}`\nDisabled plugins: `{disabled}`'.format(
             enabled='`, `'.join(enabled), disabled='`, `'.join(disabled)
         )
-        yield from command.reply(msg)
+        await command.reply(msg)

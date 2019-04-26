@@ -34,16 +34,16 @@ class Plugin(BasePlugin):
 
     @command(pattern=command_pattern,
              help="Store a message to be reminded of later, e.g. !remindme 2days 4hours do the laundry")
-    def remindme(self, command):
-        yield from command.send_typing()
+    async def remindme(self, command):
+        await command.send_typing()
         try:
             timestamp = self.parse_time(command.args.time)
         except ValueError:
-            yield from command.reply("Could not parse the time \"{}\"".format(command.args.time))
+            await command.reply("Could not parse the time \"{}\"".format(command.args.time))
             return
         member = Member.objects.from_message(command.message)
         Message.objects.create(member=member, text=command.args.message, deliver_at=timestamp)
-        yield from command.reply("I'll do so in {}".format(timeuntil(timestamp)))
+        await command.reply("I'll do so in {}".format(timeuntil(timestamp)))
 
     def parse_time(self, delta_string):
         """
@@ -66,7 +66,7 @@ class Plugin(BasePlugin):
             return parse(delta_string).replace(tzinfo=timezone.utc)
 
     @asyncio.coroutine
-    def on_ready(self):
+    async def on_ready(self):
         """
         Fired when the client is logged in - start the polling loop.
         """
@@ -76,7 +76,7 @@ class Plugin(BasePlugin):
             for message in Message.objects.to_deliver_now():
                 member = find(lambda m: m.id == message.member.discord_id, server.members)
                 msg = "{}: {}".format(member.mention, message.text)
-                yield from self.client.send_message(member, msg)
+                await self.client.send_message(member, msg)
                 message.delivered = True
                 message.save()
-            yield from asyncio.sleep(5)
+            await asyncio.sleep(5)

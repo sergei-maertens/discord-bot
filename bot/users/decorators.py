@@ -9,11 +9,11 @@ def command_passes_test(check_function, message='Insufficient permissions'):
     """
     def decorator(func):
         @wraps(func)
-        def _wrapped(plugin, command, *args, **kwargs):
+        async def _wrapped(plugin, command, *args, **kwargs):
             if not check_function(command):
-                yield from command.reply(message)
+                await command.reply(message)
                 return
-            yield from func(plugin, command, *args, **kwargs)
+            await func(plugin, command, *args, **kwargs)
         return _wrapped
     return decorator
 
@@ -21,11 +21,11 @@ def command_passes_test(check_function, message='Insufficient permissions'):
 def permission_required(permission):
     def decorator(func):
         @wraps(func)
-        def _wrapped(plugin, command, *args, **kwargs):
+        async def _wrapped(plugin, command, *args, **kwargs):
             if not has_channel_permission(command.message, permission):
-                yield from command.reply('Insufficient permissions: `{}` required'.format(permission))
+                await command.reply('Insufficient permissions: `{}` required'.format(permission))
                 return
-            yield from func(plugin, command, *args, **kwargs)
+            await func(plugin, command, *args, **kwargs)
         return _wrapped
     return decorator
 
@@ -37,9 +37,9 @@ def bot_admin_required(func):
     """
 
     @wraps(func)
-    def decorator(plugin, command, *args, **kwargs):
+    async def decorator(plugin, command, *args, **kwargs):
         if not is_bot_admin(command.message):
-            yield from command.reply('You don\'t have permission for this command')
+            await command.reply('You don\'t have permission for this command')
             return
-        yield from func(plugin, command, *args, **kwargs)
+        await func(plugin, command, *args, **kwargs)
     return decorator
