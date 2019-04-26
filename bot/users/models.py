@@ -32,4 +32,4 @@ class Member(models.Model):
     objects = MemberQuerySet.as_manager()
 
     def __str__(self):
-        return '<@{}>'.format(self.discord_id)
+        return '<@{} name={}>'.format(self.discord_id, self.name)

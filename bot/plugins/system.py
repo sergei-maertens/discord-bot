@@ -61,6 +61,7 @@ class Plugin(BasePlugin):
             "Memory usage: `{mem}`\n"
             "OS: `{system}, {release}`\n"
             "Current branch: `{branch}`, `{commit}`, \n`{message}`\n"
+            "{website}, \n{github}\n"
         ).format(
             mem=filesizeformat(mem_usage),
             uptime=timesince(created),
@@ -69,6 +70,8 @@ class Plugin(BasePlugin):
             branch=repo.active_branch.name,
             commit=repo.active_branch.commit.hexsha,
             message=repo.active_branch.commit.message,
+            website=settings.SITE_URL,
+            github=settings.GITHUB_URL
         )
         yield from command.reply(msg)
 

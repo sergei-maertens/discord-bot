@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import GameSession, LoggedMessage
+from .models import Download, GameSession, LoggedMessage
 
 
 @admin.register(LoggedMessage)
@@ -16,3 +16,10 @@ class GameSessionAdmin(admin.ModelAdmin):
     list_display = ['member', 'game', 'start', 'duration']
     list_filter = ['game', 'member']
     ordering = ['-start']
+
+
+@admin.register(Download)
+class DownloadAdmin(admin.ModelAdmin):
+    list_display = ['title', 'file']
+    list_filter = ['created']
+    ordering = ['-created']

@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:11-alpine
+
+  bot:
+    build: .
+    environment:
+      - TOKEN=${TOKEN}
+      - OWNER_ID=${OWNER_ID}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+
+  web:
+    build: .
+    command: /uwsgi.sh
+    environment:
+      - TOKEN=${TOKEN}
+      - OWNER_ID=${OWNER_ID}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db

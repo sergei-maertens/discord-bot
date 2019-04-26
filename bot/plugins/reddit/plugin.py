@@ -27,6 +27,7 @@ class Plugin(BasePlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._subreddit_cache = {}
         self.reddit_bot = praw.Reddit(user_agent=self.options['useragent'])
 
     def get_nsfw_allowed(self, command):
@@ -138,7 +139,35 @@ class Plugin(BasePlugin):
             reddit_cmd.times_used = F('times_used') + 1
             reddit_cmd.save()
         except RedditCommand.DoesNotExist:
-            return
+            if cmd.startswith('r/'):
+                sr = cmd[2:]
+            elif cmd.startswith('/r/'):
+                sr = cmd[3:]
+            else:
+                return
+            # test if it's a subreddit after all
+            if sr not in self._subreddit_cache:
+                subreddit = self.reddit_bot.get_subreddit(sr)
+                try:
+                    subreddit.id
+                except (praw.errors.InvalidSubreddit, praw.errors.NotFound):
+                    self._subreddit_cache[sr] = None
+                    return
+                else:  # it exists
+                    reddit_cmd = RedditCommand.objects.create(
+                        command=cmd, subreddit=sr,
+                        nsfw=subreddit.over18, times_used=1)
+            elif self._subreddit_cache[sr] is None:
+                return
+            else:
+                logger.error('errr?')
+                return
+
+        if reddit_cmd.subreddit not in self._subreddit_cache:
+            self._subreddit_cache[reddit_cmd.subreddit] = {
+                'seen': set(),
+                'sr': self.reddit_bot.get_subreddit(reddit_cmd.subreddit)
+            }
 
         allow_nsfw = self.get_nsfw_allowed(command)
         if reddit_cmd.nsfw and not allow_nsfw:
@@ -146,10 +175,24 @@ class Plugin(BasePlugin):
             return
 
         yield from command.send_typing()
-        subreddit = self.reddit_bot.get_subreddit(reddit_cmd.subreddit)
+        subreddit = self._subreddit_cache[reddit_cmd.subreddit]['sr']
+
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)
-        submissions = [s for s in subreddit.get_hot(limit=50)]
+        seen = self._subreddit_cache[subreddit.display_name]['seen']
+        submissions = [s for s in subreddit.get_hot(limit=50) if s.id not in seen]
+        if not submissions:
+            yield from command.reply('Couldn\'t find suitable submissions... :( ')
+            return
         submission = random.choice(submissions)
+        seen.add(submission.id)
+
         logger.debug('Picked a submission')
-        yield from command.reply(submission.url)
+        if submission.over_18 and not allow_nsfw:
+            yield from command.reply('*NSFW posts are not allowed here, not displaying it.*')
+        else:
+            yield from command.reply("**{}**".format(submission.title))
+            if not submission.selftext and submission.url:
+                yield from command.reply(submission.url)
+            else:
+                yield from command.reply(submission.selftext)
         logger.debug('Sent message')

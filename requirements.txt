@@ -1,11 +1,14 @@
 discord.py==0.13.0
 praw==3.3.0
 bpython
-django==1.10.2
+django==1.10.3
 psutil==3.3.0
 pytz==2016.7
 gitpython
 tabulate==0.7.5
+django-import-export==0.5.1
+python-dateutil==2.5.3
+parsedatetime==2.1
 
-uwsgi==2.0.12
-psycopg2==2.6.1
+uwsgi==2.0.18
+psycopg2==2.8.2

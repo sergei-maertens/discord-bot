@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urljoin
 
 PROJECT_ROOT = os.path.abspath(os.path.join(__file__, os.pardir, os.pardir))
 
@@ -10,6 +11,9 @@ PASSWORD = os.getenv('PASSWORD') or 'secret'
 OWNER_ID = os.getenv('OWNER_ID')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
+
+SITE_URL = 'http://botbt.xbbtx.be'
+GITHUB_URL = 'https://github.com/sergei-maertens/discord-bot'
 
 LOGGING_CONFIG = 'logging.config.dictConfig'
 LOGGING = {
@@ -53,6 +57,7 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'HOST': os.getenv('DB_HOST'),
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
@@ -72,8 +77,10 @@ INSTALLED_APPS = [
     'bot.games',
     'bot.users',
 
+    'bot.plugins.custom_commands',
     'bot.plugins.game_notifications',
     'bot.plugins.reddit',
+    'bot.plugins.remindme',
     'bot.plugins.stats',
     'bot.plugins.status',
 ]
@@ -105,6 +112,9 @@ PLUGINS = {
     'log': {
         'enabled': True,
     },
+    'custom_commands': {
+        'enabled': True,
+    },
     'game_notifications': {
         'enabled': True,
     },
@@ -129,6 +139,12 @@ PLUGINS = {
     },
     'status': {
         'enabled': True,
+    },
+    'refuse_command': {
+        'enabled': True,
+    },
+    'remindme': {
+        'enabled': True,
     }
 }
 
@@ -143,6 +159,9 @@ AUTH_USER_MODEL = 'accounts.User'
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = urljoin(SITE_URL, '/media/')
 
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'botbt.xbbtx.be']

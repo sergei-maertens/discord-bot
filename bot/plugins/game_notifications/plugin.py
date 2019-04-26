@@ -98,27 +98,5 @@ class Plugin(BasePlugin):
             _games.append(
                 '{name}{muted}'.format(name=game['game_name'], muted=' (muted)' if game['muted'] else '')
             )
-        msg = 'You\'re susbcribed to: {games}'.format(games=', '.join(_games))
+        msg = 'You\'re subscribed to: {games}'.format(games=', '.join(_games))
         yield from command.reply(msg)
-
-    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def mute(self, command):
-        user = command.message.author.id
-        game = command.args.game
-        updated = GameNotification.objects.filter(user=user, game_name__iexact=game).update(muted=True)
-        if updated:
-            msg = 'Muted {game} notifications'
-        else:
-            msg = '{game} notifications were already muted'
-        yield from command.reply(msg.format(game=game))
-
-    @command(pattern=re.compile(r'(?P<game>.+)', re.IGNORECASE))
-    def unmute(self, command):
-        user = command.message.author.id
-        game = command.args.game
-        updated = GameNotification.objects.filter(user=user, game_name__iexact=game).update(muted=False)
-        if updated:
-            msg = 'Unmuted {game} notifications'
-        else:
-            msg = '{game} notifications were not muted'
-        yield from command.reply(msg.format(game=game))
