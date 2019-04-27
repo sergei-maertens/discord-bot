@@ -202,7 +202,7 @@ def format_delta(delta):
     minutes, seconds = divmod(seconds, 60)
     min_minutes = not hours and not delta.days
     minutes = max(1, minutes) if min_minutes else minutes
-    return f"{delta.days} days, {delta.hours} hours, {minutes} minutes"
+    return f"{delta.days} days, {hours} hours, {minutes} minutes"
 
 
 def get_game_time(**filters) -> list:
