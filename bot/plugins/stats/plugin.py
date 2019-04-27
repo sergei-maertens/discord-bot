@@ -159,25 +159,21 @@ class Plugin(BasePlugin):
     @command(help='Shows the most popular games in total play time')
     async def stat_games(self, command):
         await command.send_typing()
-
         server_id = command.message.server.id
-        games = (
-            GameSession.objects
-            .filter(server=server_id)
-            .get_game_durations()
-        )[:15]
+        data = get_game_time(server=server_id)
+        await command.reply("```\n{}\n```".format(
+            tabulate(data, headers=('Game', 'Time')))
+        )
 
-        def format_delta(delta):
-            hours, seconds = divmod(delta.seconds, 3600)
-            minutes, seconds = divmod(seconds, 60)
-            min_minutes = not hours and not delta.days
-            return "{days} days, {hours} hours, {minutes} minutes".format(
-                days=delta.days, hours=hours, minutes=max(1, minutes) if min_minutes else minutes)
-
-        data = [
-            (game['game__name'], format_delta(game['time'])) for game in games
-        ]
-        await command.reply("```\n{}\n```".format(tabulate(data, headers=('Game', 'Time'))))
+    @command(help='Show my game time, registered through the discord status')
+    async def stat_my_games(self, command):
+        await command.send_typing()
+        server_id = command.message.server.id
+        member_id = command.message.author.id
+        data = get_game_time(server=server_id, member__discord_id=member_id)
+        await command.reply("```\n{}\n```".format(
+            tabulate(data, headers=('Game', 'Time')))
+        )
 
     @command(
         pattern=re.compile(r'(?P<format>{})?'.format(
@@ -199,3 +195,24 @@ class Plugin(BasePlugin):
         filename = '{}.{}'.format(command.command.name, file_format.get_extension())
         download.file.save(filename, File(_file))
         await command.reply('Download the file at {}'.format(download.file.url))
+
+
+def format_delta(delta):
+    hours, seconds = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    min_minutes = not hours and not delta.days
+    minutes = max(1, minutes) if min_minutes else minutes
+    return f"{delta.days} days, {delta.hours} hours, {minutes} minutes"
+
+
+def get_game_time(**filters) -> list:
+    games = (
+        GameSession.objects.filter(**filters)
+        .get_game_durations()
+    )[:15]
+
+    data = [
+        (game['game__name'], format_delta(game['time']))
+        for game in games
+    ]
+    return data
