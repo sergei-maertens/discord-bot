@@ -31,11 +31,22 @@ class LoggedMessage(models.Model):
 
 class GameSessionQuerySet(models.QuerySet):
 
-    def get_game_durations(self):
-        return self.filter(duration__isnull=False).values('game__name').annotate(
-            time=Sum('duration'),
-            num_players=Count('member', distinct=True)
-        ).filter(num_players__gt=1).order_by('-time')
+    def get_game_durations(self, member_id: str = None) -> models.QuerySet:
+        base = self.filter(duration__isnull=False).values('game__name')
+        annotations, extra_filters = dict(time=Sum('duration')), {}
+
+        if not member_id:
+            annotations['num_players'] = Count('member', distinct=True)
+            extra_filters['num_players__gt'] = 1
+        else:
+            base = base.filter(member__discord_id=member_id)
+
+        return (
+            base
+            .annotate(**annotations)
+            .filter(**extra_filters)
+            .order_by('-time')
+        )
 
 
 class GameSession(models.Model):

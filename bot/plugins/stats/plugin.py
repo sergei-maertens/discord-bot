@@ -170,7 +170,7 @@ class Plugin(BasePlugin):
         await command.send_typing()
         server_id = command.message.server.id
         member_id = command.message.author.id
-        data = get_game_time(server=server_id, member__discord_id=member_id)
+        data = get_game_time(server=server_id, member_id=member_id)
         await command.reply("```\n{}\n```".format(
             tabulate(data, headers=('Game', 'Time')))
         )
@@ -205,10 +205,10 @@ def format_delta(delta):
     return f"{delta.days} days, {hours} hours, {minutes} minutes"
 
 
-def get_game_time(**filters) -> list:
+def get_game_time(server: str, member_id: str = None) -> list:
     games = (
-        GameSession.objects.filter(**filters)
-        .get_game_durations()
+        GameSession.objects.filter(server=server)
+        .get_game_durations(member_id=member_id)
     )[:15]
 
     data = [
