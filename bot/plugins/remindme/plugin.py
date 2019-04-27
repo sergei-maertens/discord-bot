@@ -65,7 +65,6 @@ class Plugin(BasePlugin):
         else:
             return parse(delta_string).replace(tzinfo=timezone.utc)
 
-    @asyncio.coroutine
     async def on_ready(self):
         """
         Fired when the client is logged in - start the polling loop.

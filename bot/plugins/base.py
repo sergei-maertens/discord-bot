@@ -56,7 +56,7 @@ class MethodPool(dict):
                     coro = await future
                     coros.append(coro)
                 else:
-                    handler = asyncio.coroutine(handler)(*args, **kwargs)  # real coroutine can be called
+                    handler = handler(*args, **kwargs)  # real coroutine can be called
                     coros.append(handler)
             await asyncio.gather(*coros)
         return grouped
@@ -157,6 +157,5 @@ class BasePlugin(metaclass=BasePluginMeta):
                 assert asyncio.iscoroutinefunction(handler)
                 await handler(self, command)
 
-    def on_message_edit(self, before, after):
-        return
-        yield
+    async def on_message_edit(self, before, after):
+        pass
