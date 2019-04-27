@@ -1,11 +1,12 @@
 import asyncio
+import os
 import re
 
 
 __all__ = ['PREFIX', 'command']
 
 
-PREFIX = '!'
+PREFIX = os.getenv('PREFIX', '!')
 
 
 class command(object):

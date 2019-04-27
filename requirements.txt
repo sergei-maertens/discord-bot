@@ -1,11 +1,11 @@
 discord.py==0.13.0
 praw==3.3.0
 bpython
-django==1.10.3
+django==2.2
 psutil==3.3.0
 pytz==2016.7
 tabulate==0.7.5
-django-import-export==0.5.1
+django-import-export==1.2.0
 python-dateutil==2.5.3
 parsedatetime==2.1
 

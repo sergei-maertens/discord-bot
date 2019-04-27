@@ -18,7 +18,7 @@ class GameQuerySet(models.QuerySet):
 
 class Game(models.Model):
     name = models.CharField(_('name'), max_length=255)
-    alias_for = models.ForeignKey('self', null=True, blank=True)
+    alias_for = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
     objects = GameQuerySet.as_manager()
 

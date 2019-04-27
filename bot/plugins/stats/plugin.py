@@ -3,7 +3,7 @@ import re
 from io import BytesIO, StringIO
 
 from django.core.files import File
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils.timesince import timesince
 from django.utils.timezone import make_aware, now, utc
 
@@ -46,6 +46,7 @@ class Plugin(BasePlugin):
         n_lines = len(message.content.splitlines())
 
         logged_message = LoggedMessage.objects.create(
+            server=message.server.id,
             discord_id=message.id, member=member,
             member_username=message.author.name,
             channel=channel, content=message.content,
@@ -82,14 +83,20 @@ class Plugin(BasePlugin):
         if not before.game and after.game:
             game = Game.objects.get_by_name(after.game.name)
             GameSession.objects.create(
-                member=member, game=game,
+                server=before.server.id,
+                member=member,
+                game=game,
                 start=now()
             )
         # stopped playing
         elif before.game and not after.game:
             game = game = Game.objects.get_by_name(before.game.name)
             try:
-                session = GameSession.objects.filter(member=member, game=game).latest('start')
+                session = GameSession.objects.filter(
+                    member=member,
+                    game=game,
+                    server=before.server.id,
+                ).latest('start')
             except GameSession.DoesNotExist:
                 pass
             else:
@@ -100,7 +107,15 @@ class Plugin(BasePlugin):
     @command(help='Show the top 10 posters')
     async def stat_messages(self, command):
         await command.send_typing()
-        queryset = Member.objects.exclude(is_bot=True).annotate(num_messages=Count('messages_authored'))
+        server_id = command.message.server.id
+        queryset = (
+            Member.objects
+            .exclude(is_bot=True)
+            .annotate(num_messages=Count(
+                'messages_authored',
+                filter=Q(messages_authored__server=server_id)
+            ))
+        )
         top_10 = queryset.order_by('-num_messages')[:10]
         data = [(member.name or str(member), member.num_messages) for member in top_10]
         output = tabulate(data, headers=('User', 'Messages'))
@@ -144,7 +159,13 @@ class Plugin(BasePlugin):
     @command(help='Shows the most popular games in total play time')
     async def stat_games(self, command):
         await command.send_typing()
-        games = GameSession.objects.get_game_durations()[:15]
+
+        server_id = command.message.server.id
+        games = (
+            GameSession.objects
+            .filter(server=server_id)
+            .get_game_durations()
+        )[:15]
 
         def format_delta(delta):
             hours, seconds = divmod(delta.seconds, 3600)

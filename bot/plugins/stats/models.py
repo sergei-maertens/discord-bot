@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 class LoggedMessage(models.Model):
 
     discord_id = models.CharField(max_length=50, unique=True)
+    server = models.CharField(_("server"), max_length=30)
 
     member = models.ForeignKey('users.Member', related_name='messages_authored', on_delete=models.PROTECT)
     member_username = models.CharField(max_length=255)  # this can change, only the member.discord_id is a constant
@@ -39,7 +40,8 @@ class GameSessionQuerySet(models.QuerySet):
 
 class GameSession(models.Model):
     member = models.ForeignKey('users.Member', on_delete=models.PROTECT)
-    game = models.ForeignKey('games.Game')
+    server = models.CharField(_("server"), max_length=30)
+    game = models.ForeignKey('games.Game', on_delete=models.CASCADE)
     start = models.DateTimeField(_('start'))
     stop = models.DateTimeField(_('stop'), null=True, blank=True)
     duration = models.DurationField(null=True, blank=True)

@@ -170,7 +170,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'botbt.xbbtx.be']
 WSGI_APPLICATION = 'bot.wsgi.application'
 
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

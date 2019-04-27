@@ -30,7 +30,7 @@ class Command(models.Model):
 
 
 class CommandAction(models.Model):
-    command = models.ForeignKey(Command)
+    command = models.ForeignKey(Command, on_delete=models.CASCADE)
     action = models.TextField(_('action'), help_text=_('Text to be replied'))
 
     class Meta:
