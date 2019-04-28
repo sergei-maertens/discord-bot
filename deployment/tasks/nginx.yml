@@ -1,0 +1,28 @@
+---
+
+# Nginx
+
+- name: Ensure nginx is installed
+  package:
+    name: nginx
+    state: present
+
+- name: Ensure log dir exists
+  file:
+    path: "{{ nginx_log_dir }}"
+    state: directory
+
+- name: Install nginx config
+  template:
+    src: botbt.conf
+    dest: /etc/nginx/sites-available/botbt.conf
+  notify:
+    - reload nginx
+
+- name: Enable vhost
+  file:
+    src: /etc/nginx/sites-available/botbt.conf
+    dest: /etc/nginx/sites-enabled/botbt.conf
+    state: link
+  notify:
+    - reload nginx

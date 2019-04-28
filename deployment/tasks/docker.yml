@@ -1,0 +1,78 @@
+---
+
+# Docker
+
+- name: Ensure docker package is available
+  pip:
+    name: docker
+    state: present
+
+- name: Ensure a separate network exists
+  docker_network:
+    name: botbt
+
+- name: Ensure a database volume exists
+  docker_volume:
+    name: botbt-db
+
+- name: Ensure PostgreSQL container runs
+  docker_container:
+    name: botbt-db
+    image: postgres:11-alpine
+    hostname: botbt-db
+    state: started
+    restart: no
+    restart_policy: always
+    networks:
+      - name: botbt
+    volumes:
+      - botbt-db:/var/lib/postgresql/data
+    env:
+      POSTGRES_PASSWORD: "{{ db.password }}"
+
+- name: Ensure main container runs
+  docker_container:
+    name: botbt-main
+    image: "{{ image }}"
+    pull: yes
+    hostname: botbt-main
+    state: started
+    restart: no
+    restart_policy: always
+    networks:
+      - name: botbt
+    env:
+      TOKEN: "{{ token }}"
+      OWNER_ID: "{{ owner_id }}"
+      SECRET_KEY: "{{ secret_key }}"
+      DB_HOST: "botbt-db"
+      DB_NAME: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "{{ db.password }}"
+  tags:
+    - quick-update
+
+- name: Ensure web container runs
+  docker_container:
+    name: botbt-web
+    image: "{{ image }}"
+    pull: yes
+    hostname: botbt-web
+    state: started
+    restart: no
+    restart_policy: always
+    networks:
+      - name: botbt
+    env:
+      TOKEN: "{{ token }}"
+      OWNER_ID: "{{ owner_id }}"
+      SECRET_KEY: "{{ secret_key }}"
+      DB_HOST: "botbt-db"
+      DB_NAME: "postgres"
+      DB_USER: "postgres"
+      DB_PASSWORD: "{{ db.password }}"
+    published_ports:
+      - "127.0.0.1:{{ web_port }}:8000"
+    command: /uwsgi.sh
+  tags:
+    - quick-update
