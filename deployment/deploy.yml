@@ -74,7 +74,7 @@
         name: botbt-main
         image: "{{ image }}"
         pull: yes
-        hostname: botbt
+        hostname: botbt-main
         state: started
         restart: no
         restart_policy: always
@@ -96,7 +96,7 @@
         name: botbt-web
         image: "{{ image }}"
         pull: yes
-        hostname: botbt
+        hostname: botbt-web
         state: started
         restart: no
         restart_policy: always

@@ -36,7 +36,7 @@ class Plugin(BasePlugin):
     @command(pattern=re.compile(r'(?P<prob>0\.[\d]+)'))
     async def set_probability(self, command):
         self.PROBABILITY = float(command.args.prob)
-        yield
+        await command.reply(f"Probability set to {self.PROBABILITY}")
 
     @command()
     async def show_probability(self, command):
