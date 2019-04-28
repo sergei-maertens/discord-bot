@@ -53,7 +53,9 @@ class Plugin(BasePlugin):
             num_lines=n_lines
         )
         if message.mentions:
-            logged_message.mentions = Member.objects.from_mentions(message.mentions)
+            logged_message.mentions.set(
+                Member.objects.from_mentions(message.mentions)
+            )
 
     async def on_message_edit(self, before, after):
         await super().on_message_edit(before, after)
@@ -74,35 +76,38 @@ class Plugin(BasePlugin):
             await super().on_member_update(before, after)
 
         member = Member.objects.from_discord(after)
+        server = after.server.id
 
         if before.status != after.status and after.status != Status.online:
             member.last_seen = now()
             member.save()
 
-        # started playing a game
-        if not before.game and after.game:
-            game = Game.objects.get_by_name(after.game.name)
-            GameSession.objects.create(
-                server=before.server.id,
-                member=member,
-                game=game,
-                start=now()
-            )
-        # stopped playing
-        elif before.game and not after.game:
-            game = game = Game.objects.get_by_name(before.game.name)
-            try:
-                session = GameSession.objects.filter(
-                    member=member,
-                    game=game,
-                    server=before.server.id,
-                ).latest('start')
-            except GameSession.DoesNotExist:
-                pass
-            else:
-                session.stop = now()
-                session.duration = session.stop - session.start
-                session.save()
+        # nothing game wise has changed - abort
+        if not before.game and not after.game:
+            return
+
+        # if no status was set before, and there is one after, a game was started
+        started_session = before.game is None and after.game is not None
+        # if no status is set after, but there was one before, a game was stopped
+        stopped_session = before.game is not None and after.game is None
+
+        changed_session = (
+            not (started_session or stopped_session)
+            and before.game.name != after.game.name  # noqa
+        )
+
+        if started_session:
+            GameSession.objects.start(after.game, member, server)
+        else:
+            last_session = GameSession.objects.last_session_for_member(member, server)
+            game = Game.objects.get_by_name(before.game.name)
+
+            if stopped_session or changed_session:
+                if last_session and last_session.game == game:
+                    last_session.stop_session()
+
+            if changed_session:
+                GameSession.objects.start(after.game, member, server)
 
     @command(help='Show the top 10 posters')
     async def stat_messages(self, command):

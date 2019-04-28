@@ -1,6 +1,14 @@
+from typing import Union
+
 from django.db import models
 from django.db.models import Count, Sum
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+import discord
+
+from bot.games.models import Game
+from bot.users.models import Member
 
 
 class LoggedMessage(models.Model):
@@ -48,6 +56,26 @@ class GameSessionQuerySet(models.QuerySet):
             .order_by('-time')
         )
 
+    def start(self, game: discord.Game, member: Member, server: str) -> models.Model:
+        game = Game.objects.get_by_name(game.name)
+        return self.create(
+            server=server,
+            member=member,
+            game=game,
+            start=timezone.now()
+        )
+
+    def last_session_for_member(self, member: Member, server: str) -> Union[None, models.Model]:
+        try:
+            last_session = (
+                self
+                .filter(member=member, server=server)
+                .latest('start')
+            )
+        except self.model.DoesNotExist:
+            return None
+        return last_session
+
 
 class GameSession(models.Model):
     member = models.ForeignKey('users.Member', on_delete=models.PROTECT)
@@ -65,6 +93,15 @@ class GameSession(models.Model):
 
     def __str__(self):
         return self.game.name
+
+    def save(self, *args, **kwargs):
+        if self.stop and not self.duration:
+            self.duration = self.stop - self.start
+        super().save(*args, **kwargs)
+
+    def stop_session(self):
+        self.stop = timezone.now()
+        self.save()
 
 
 class Download(models.Model):
