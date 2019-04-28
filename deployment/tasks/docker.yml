@@ -15,6 +15,10 @@
   docker_volume:
     name: botbt-db
 
+- name: Ensure a data volume exists for uploads
+  docker_volume:
+    name: botbt-data
+
 - name: Ensure PostgreSQL container runs
   docker_container:
     name: botbt-db
@@ -41,6 +45,8 @@
     restart_policy: always
     networks:
       - name: botbt
+    volumes:
+      - botbt-data:/app/media
     env:
       TOKEN: "{{ token }}"
       OWNER_ID: "{{ owner_id }}"
@@ -63,6 +69,8 @@
     restart_policy: always
     networks:
       - name: botbt
+    volumes:
+      - botbt-data:/app/media
     env:
       TOKEN: "{{ token }}"
       OWNER_ID: "{{ owner_id }}"
