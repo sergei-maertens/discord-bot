@@ -2,7 +2,6 @@ import logging
 
 from bot.plugins.base import BasePlugin
 
-
 logger = logging.getLogger(__name__)
 
 

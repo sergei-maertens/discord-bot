@@ -6,7 +6,6 @@ from bot.plugins.commands import command
 from bot.plugins.events import StopCommandExecution, command_resolved, receiver
 from bot.users.decorators import bot_admin_required
 
-
 BASE_PROBABILITY = 0.1  # 10% to start with
 
 

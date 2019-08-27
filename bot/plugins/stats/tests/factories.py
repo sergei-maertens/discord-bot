@@ -1,9 +1,8 @@
 from datetime import timedelta
 
-from django.utils import timezone
-
 import factory
 import factory.fuzzy
+from django.utils import timezone
 
 
 class GameSessionFactory(factory.django.DjangoModelFactory):

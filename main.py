@@ -9,13 +9,12 @@ the bot.
 import logging
 from importlib import import_module
 
-import django
 import discord
-
+import django
 from django.conf import settings
+
 from bot.plugins.base import MethodPool
 from bot.plugins.events import EventPool
-
 
 logger = logging.getLogger('bot')
 

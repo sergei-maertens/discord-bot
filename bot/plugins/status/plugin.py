@@ -8,7 +8,6 @@ from bot.plugins.commands import command
 
 from .models import GameStatus
 
-
 logger = logging.getLogger(__name__)
 
 

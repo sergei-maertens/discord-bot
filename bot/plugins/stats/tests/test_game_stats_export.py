@@ -2,9 +2,9 @@ from datetime import timedelta
 
 from django.test import TestCase
 
-from .factories import GameSessionFactory
 from ..models import GameSession
 from ..resources import GamesPlayedResource
+from .factories import GameSessionFactory
 
 
 class ExportTests(TestCase):

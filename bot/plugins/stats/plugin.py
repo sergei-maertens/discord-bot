@@ -2,14 +2,13 @@ import logging
 import re
 from io import BytesIO, StringIO
 
+from discord.enums import Status
 from django.core.files import File
 from django.db.models import Count, Q
 from django.utils.timesince import timesince
 from django.utils.timezone import make_aware, now, utc
-
-from discord.enums import Status
-from tabulate import tabulate
 from import_export.admin import DEFAULT_FORMATS
+from tabulate import tabulate
 
 from bot.channels.models import Channel
 from bot.games.models import Game
@@ -17,9 +16,8 @@ from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
 from bot.users.models import Member
 
-from .models import Download, LoggedMessage, GameSession
+from .models import Download, GameSession, LoggedMessage
 from .resources import GamesPlayedResource
-
 
 logger = logging.getLogger(__name__)
 

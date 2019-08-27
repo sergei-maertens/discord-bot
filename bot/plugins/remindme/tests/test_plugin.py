@@ -1,8 +1,8 @@
 from datetime import datetime
 from unittest import TestCase, mock
 
-from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 
 from ..plugin import Plugin
 

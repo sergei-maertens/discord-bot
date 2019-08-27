@@ -12,7 +12,6 @@ from bot.plugins.commands import command
 
 from .models import GameNotification
 
-
 logger = logging.getLogger(__name__)
 
 COOLDOWN = 5 * 60  # 5 minutes

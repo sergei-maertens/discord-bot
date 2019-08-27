@@ -1,6 +1,6 @@
 from functools import wraps
 
-from .utils import is_bot_admin, has_channel_permission
+from .utils import has_channel_permission, is_bot_admin
 
 
 def command_passes_test(check_function, message='Insufficient permissions'):

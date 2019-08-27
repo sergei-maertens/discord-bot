@@ -7,11 +7,11 @@ from django.db.models import F
 
 from bot.channels.models import Channel
 from bot.plugins.base import BasePlugin
-from bot.plugins.commands import command, Command, PREFIX
-from bot.users.decorators import command_passes_test, is_bot_admin, has_channel_permission
+from bot.plugins.commands import PREFIX, Command, command
+from bot.users.decorators import (command_passes_test, has_channel_permission,
+                                  is_bot_admin)
 
 from .models import RedditCommand
-
 
 logger = logging.getLogger(__name__)
 

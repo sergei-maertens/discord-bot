@@ -2,7 +2,6 @@ import logging
 
 from .base import BasePlugin
 
-
 logger = logging.getLogger(__name__)
 
 
