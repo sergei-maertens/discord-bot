@@ -10,6 +10,9 @@ EMAIL = os.getenv('EMAIL') or 'bot@dogood.com'
 PASSWORD = os.getenv('PASSWORD') or 'secret'
 OWNER_ID = os.getenv('OWNER_ID')
 
+MC_SERVER = os.getenv('MC_SERVER')
+MC_SERVER_PASSWORD = os.getenv('MC_PASSWORD')
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'i-am-very-secret')
 
 SITE_URL = 'https://botbt.xbbtx.be'
@@ -145,6 +148,11 @@ PLUGINS = {
     },
     'remindme': {
         'enabled': True,
+    },
+    'minecraft': {
+        'enabled': True,
+        'server': MC_SERVER,
+        'password': MC_SERVER_PASSWORD,
     }
 }
 
