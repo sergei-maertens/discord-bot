@@ -55,6 +55,8 @@
       DB_NAME: "postgres"
       DB_USER: "postgres"
       DB_PASSWORD: "{{ db.password }}"
+      MC_SERVER: "{{ mc_server }}"
+      MC_PASSWORD: "{{ mc_password }}"
   tags:
     - quick-update
 
