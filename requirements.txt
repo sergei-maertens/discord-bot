@@ -8,6 +8,7 @@ tabulate==0.7.5
 django-import-export==1.2.0
 python-dateutil==2.5.3
 parsedatetime==2.1
+mcrcon==0.5.2
 
 uwsgi==2.0.18
 psycopg2==2.8.2
