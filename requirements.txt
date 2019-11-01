@@ -1,7 +1,7 @@
 discord.py==0.13.0
 praw==3.3.0
 bpython
-django==2.2
+django==2.2.4
 psutil==3.3.0
 pytz==2016.7
 tabulate==0.7.5
