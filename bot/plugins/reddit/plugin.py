@@ -3,6 +3,7 @@ import random
 import re
 
 import praw
+from discord.channel import TextChannel
 from django.db.models import F
 
 from bot.channels.models import Channel
@@ -37,13 +38,10 @@ class Plugin(BasePlugin):
         * it's a channel explicitly marked as nsfw allowed
         """
         discord_channel = command.message.channel
-        if discord_channel.is_private:
+        if not isinstance(discord_channel, TextChannel):
             return True
         else:
-            channel, _ = Channel.objects.get_or_create(discord_id=discord_channel.id, defaults={
-                'name': discord_channel.name
-            })
-            return channel.allow_nsfw
+            return discord_channel.is_nsfw()
         return False
 
     @command(

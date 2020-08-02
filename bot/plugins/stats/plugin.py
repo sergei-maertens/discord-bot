@@ -1,6 +1,7 @@
 import logging
 import re
 
+from discord.channel import TextChannel
 from discord.enums import Status
 from django.db.models import Count, Q
 from django.utils.timesince import timesince
@@ -31,7 +32,7 @@ class Plugin(BasePlugin):
         """
         await super().on_message(message)
 
-        if message.channel.is_private:
+        if not isinstance(message.channel, TextChannel):
             return
 
         member = Member.objects.from_message(message)
