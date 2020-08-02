@@ -1,7 +1,7 @@
 import logging
 import re
 
-from discord.game import Game
+from discord import CustomActivity
 
 from bot.plugins.base import BasePlugin
 from bot.plugins.commands import command
@@ -37,12 +37,11 @@ class Plugin(BasePlugin):
             if status is None:
                 await command.reply('I have no known statuses...')
                 return
-        game = Game(name=status)
-        await self.client.change_presence(game=game)
+        await self.client.change_presence(activity=CustomActivity(name=status))
 
     @command()
     async def clear_status(self, command):
-        await self.client.change_presence(game=None)
+        await self.client.change_presence(activity=None)
 
     @command()
     async def list_status(self, command):

@@ -60,8 +60,8 @@ class Plugin(BasePlugin):
             return
 
         if after is not None:
-            if after.edited_timestamp:
-                logged_message.edited_timestamp = make_aware(after.edited_timestamp, utc)
+            if after.edited_at:
+                logged_message.edited_timestamp = make_aware(after.edited_at, utc)
             logged_message.content = after.content
             logged_message.num_lines = len(after.content.splitlines())
             logged_message.save()

@@ -1,6 +1,7 @@
 import logging
 
 from discord.enums import Status
+from discord import Game
 from django.conf import settings
 
 from bot.plugins.base import BasePlugin
@@ -17,7 +18,9 @@ class Plugin(BasePlugin):
 
     def _member_active(self, member):
         statuses = [Status.online, Status.idle]
-        gaming = member.game and settings.DEBUG is False
+        gaming = settings.DEBUG is False and any(
+            (isinstance(activity, Game) for activity in member.activities)
+        )
         return member.status in statuses and not member.is_afk and not gaming
 
     async def on_message(self, message):
