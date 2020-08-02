@@ -12,8 +12,8 @@ from bot.users.models import Member
 
 class LoggedMessage(models.Model):
 
-    discord_id = models.CharField(max_length=50, unique=True)
-    server = models.CharField(_("server"), max_length=30)
+    discord_id = models.BigIntegerField(unique=True)
+    server = models.BigIntegerField(_("server"))
 
     member = models.ForeignKey('users.Member', related_name='messages_authored', on_delete=models.PROTECT)
     member_username = models.CharField(max_length=255)  # this can change, only the member.discord_id is a constant
@@ -78,7 +78,7 @@ class GameSessionQuerySet(models.QuerySet):
 
 class GameSession(models.Model):
     member = models.ForeignKey('users.Member', on_delete=models.PROTECT)
-    server = models.CharField(_("server"), max_length=30)
+    server = models.BigIntegerField(_("server"))
     game = models.ForeignKey('games.Game', on_delete=models.CASCADE)
     start = models.DateTimeField(_('start'))
     stop = models.DateTimeField(_('stop'), null=True, blank=True)

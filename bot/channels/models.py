@@ -13,7 +13,7 @@ class ChannelQuerySet(models.QuerySet):
 
 
 class Channel(models.Model):
-    discord_id = models.CharField(max_length=50, unique=True)
+    discord_id = models.BigIntegerField(unique=True)
     name = models.CharField(_('name'), max_length=50)
 
     allow_nsfw = models.BooleanField(default=False)

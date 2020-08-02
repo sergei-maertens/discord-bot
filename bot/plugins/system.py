@@ -38,7 +38,7 @@ class Plugin(BasePlugin):
         FIXME: https://docs.python.org/3/library/asyncio-dev.html#pending-task-destroyed
         """
         author_id = command.message.author.id
-        logger.info('Restart issued by %s, with ID %s', command.message.author.name, author_id)
+        logger.info('Restart issued by %s, with ID %d', command.message.author.name, author_id)
         await command.send_typing()
         await command.reply('Restarting...')
         raise KeyboardInterrupt
