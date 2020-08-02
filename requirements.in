@@ -16,7 +16,7 @@ mcrcon
 # django interface
 pytz
 django
-tablib[all]
+tablib[html,ods,xls,xlsx,yaml]
 django-import-export
 tabulate
 
