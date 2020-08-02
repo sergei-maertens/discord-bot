@@ -6,6 +6,7 @@ services:
 
   bot:
     build: .
+    image: sergeimaertens/discord-bot
     environment:
       - TOKEN=${TOKEN}
       - OWNER_ID=${OWNER_ID}
@@ -19,6 +20,7 @@ services:
 
   web:
     build: .
+    image: sergeimaertens/discord-bot
     command: /uwsgi.sh
     environment:
       - TOKEN=${TOKEN}
