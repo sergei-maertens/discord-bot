@@ -4,8 +4,9 @@
 #
 #    pip-compile --no-index requirements.in
 #
-aiohttp==1.0.5            # via discord.py
+aiohttp==3.6.2            # via discord.py
 async-timeout==3.0.1      # via aiohttp
+attrs==19.3.0             # via aiohttp
 blessings==1.7            # via curtsies
 bpython==0.19             # via -r requirements.in
 certifi==2020.6.20        # via requests
@@ -13,13 +14,14 @@ chardet==3.0.4            # via aiohttp, requests
 curtsies==0.3.4           # via bpython
 decorator==4.4.2          # via praw
 diff-match-patch==20200713  # via django-import-export
-discord.py==0.13.0        # via -r requirements.in
+discord.py==1.3.4         # via -r requirements.in
 django-import-export==1.2.0  # via -r requirements.in
 django==2.2.13            # via -r requirements.in, django-import-export
 greenlet==0.4.16          # via bpython
-idna==2.10                # via requests
+idna-ssl==1.1.0           # via aiohttp
+idna==2.10                # via idna-ssl, requests, yarl
 mcrcon==0.5.2             # via -r requirements.in
-multidict==4.7.6          # via aiohttp
+multidict==4.7.6          # via aiohttp, yarl
 parsedatetime==2.1        # via -r requirements.in
 praw==3.3.0               # via -r requirements.in
 psutil==3.3.0             # via -r requirements.in
@@ -28,12 +30,14 @@ pygments==2.6.1           # via bpython
 python-dateutil==2.5.3    # via -r requirements.in
 pytz==2016.7              # via -r requirements.in, django
 requests==2.24.0          # via bpython, praw, update-checker
-six==1.15.0               # via bpython, praw, python-dateutil
+six==1.15.0               # via blessings, bpython, praw, python-dateutil
 sqlparse==0.3.1           # via django
 tablib==2.0.0             # via django-import-export
 tabulate==0.7.5           # via -r requirements.in
+typing-extensions==3.7.4.2  # via aiohttp, yarl
 update-checker==0.17      # via praw
 urllib3==1.25.10          # via requests
 uwsgi==2.0.18             # via -r requirements.in
 wcwidth==0.2.5            # via curtsies
-websockets==3.4           # via discord.py
+websockets==8.1           # via discord.py
+yarl==1.5.1               # via aiohttp
