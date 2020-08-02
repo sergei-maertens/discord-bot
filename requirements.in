@@ -1,0 +1,27 @@
+python-dateutil
+parsedatetime
+
+# discord
+discord.py==0.13.0
+
+# reddit
+praw
+
+# system stats
+psutil
+
+# minecraft
+mcrcon
+
+# django interface
+pytz
+django
+django-import-export
+tabulate
+
+# dev tooling
+bpython
+
+# server/deploy
+uwsgi
+psycopg2
