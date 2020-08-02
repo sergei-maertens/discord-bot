@@ -112,13 +112,7 @@ PRAW_USER_AGENT = 'python:discord-fetcher:v0.0.1 (by /u/xBBTx)'
 
 
 PLUGINS = {
-    'log': {
-        'enabled': True,
-    },
     'custom_commands': {
-        'enabled': True,
-    },
-    'game_notifications': {
         'enabled': True,
     },
     'help': {
@@ -144,9 +138,6 @@ PLUGINS = {
         'enabled': True,
     },
     'refuse_command': {
-        'enabled': True,
-    },
-    'remindme': {
         'enabled': True,
     },
     'minecraft': {

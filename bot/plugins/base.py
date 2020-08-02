@@ -1,7 +1,6 @@
 import asyncio
 import functools
 import logging
-import re
 
 from . import commands
 from .events import command_resolved
