@@ -21,8 +21,8 @@ logger = logging.getLogger('bot')
 client = discord.Client()
 
 
-@client.async_event
-def on_ready():
+@client.event
+async def on_ready():
     logger.info('Logged in as %s, id: %s', client.user.name, client.user.id)
 
 

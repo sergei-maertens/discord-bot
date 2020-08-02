@@ -16,6 +16,7 @@ mcrcon
 # django interface
 pytz
 django
+tablib[all]
 django-import-export
 tabulate
 

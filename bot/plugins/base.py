@@ -68,7 +68,7 @@ class MethodPool(dict):
         for event, handlers in self.items():
             grouper = self.group(handlers)
             grouper.__name__ = event
-            client.async_event(grouper)
+            client.event(grouper)
 
 
 class BasePluginMeta(type):
