@@ -40,7 +40,7 @@ class Plugin(BasePlugin):
         n_lines = len(message.content.splitlines())
 
         logged_message = LoggedMessage.objects.create(
-            server=message.server.id,
+            server=message.guild.id,
             discord_id=message.id, member=member,
             member_username=message.author.name,
             channel=channel, content=message.content,
@@ -68,7 +68,7 @@ class Plugin(BasePlugin):
     @command(help='Show the top 10 posters')
     async def stat_messages(self, command):
         await command.send_typing()
-        server_id = command.message.server.id
+        server_id = command.message.guild.id
         queryset = (
             Member.objects
             .exclude(is_bot=True)
@@ -94,7 +94,7 @@ class Plugin(BasePlugin):
         else:
             username = command.args.name
             member = Member.objects.filter(name__iexact=username).first()
-            all_members = command.message.channel.server.members
+            all_members = command.message.channel.guild.members
             d_member = next((m for m in all_members if m.name.lower() == username.lower()), None)
 
         if d_member and d_member.status == Status.online:

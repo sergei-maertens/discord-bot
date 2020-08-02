@@ -29,7 +29,7 @@ class Plugin(BasePlugin):
 
     @command(pattern=re.compile(r'(?P<subject>.*)'))
     async def whoinvented(self, command):
-        guspetti = find(lambda m: m.id == GUS, command.message.server.members)
+        guspetti = find(lambda m: m.id == GUS, command.message.guild.members)
         await command.reply(
             "According to {guspetti}, {word} was invented by the Romans in Rome".format(
                 guspetti=guspetti.mention,
