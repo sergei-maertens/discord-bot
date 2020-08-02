@@ -67,7 +67,7 @@ class Plugin(BasePlugin):
 
     @command(help='Show the top 10 posters')
     async def stat_messages(self, command):
-        await command.send_typing()
+        await command.trigger_typing()
         server_id = command.message.guild.id
         queryset = (
             Member.objects

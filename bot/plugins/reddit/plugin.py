@@ -174,7 +174,7 @@ class Plugin(BasePlugin):
             await command.reply('No NSFW commands allowed here')
             return
 
-        await command.send_typing()
+        await command.trigger_typing()
         subreddit = self._subreddit_cache[reddit_cmd.subreddit]['sr']
 
         logger.debug('Fetched subreddit %s', reddit_cmd.subreddit)

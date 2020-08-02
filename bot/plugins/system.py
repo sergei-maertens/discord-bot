@@ -39,7 +39,7 @@ class Plugin(BasePlugin):
         """
         author_id = command.message.author.id
         logger.info('Restart issued by %s, with ID %d', command.message.author.name, author_id)
-        await command.send_typing()
+        await command.trigger_typing()
         await command.reply('Restarting...')
         raise KeyboardInterrupt
 

@@ -13,4 +13,4 @@ class Plugin(BasePlugin):
             return
 
         if message.content.startswith('!pm'):
-            await self.client.send_message(message.author, 'HAI')
+            await message.author.send("HAI")

@@ -64,9 +64,10 @@ class Command(object):
     def message(self):
         return self.for_message
 
-    async def send_typing(self, dest=None):
-        await self.client.send_typing(dest or self.for_message.channel)
+    async def trigger_typing(self, dest=None):
+        dest = dest or self.for_message.channel
+        await dest.trigger_typing()
 
     async def reply(self, text):
         channel = self.for_message.channel
-        await self.client.send_message(channel, text)
+        await channel.send(text)

@@ -33,5 +33,5 @@ class Plugin(BasePlugin):
         # try to match a command and fetch an action
         action = CommandAction.objects.filter(command__command__iexact=cmd).order_by('?').first()
         if action:
-            await command.send_typing()
+            await command.trigger_typing()
             await command.reply(action.action)
