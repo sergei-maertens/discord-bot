@@ -7,7 +7,7 @@
     - vars.yml
 
   vars:
-    image: sergeimaykin/discord-bot:latest
+    image: sergeimaertens/discord-bot:latest
     web_port: 8010
     hostname: botbt.xbbtx.be
     nginx_log_dir: /var/log/nginx/botbt
