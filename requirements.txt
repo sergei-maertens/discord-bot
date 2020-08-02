@@ -24,7 +24,7 @@ mcrcon==0.5.2             # via -r requirements.in
 multidict==4.7.6          # via aiohttp, yarl
 parsedatetime==2.1        # via -r requirements.in
 praw==3.3.0               # via -r requirements.in
-psutil==3.3.0             # via -r requirements.in
+psutil==5.7.2             # via -r requirements.in
 psycopg2==2.8.2           # via -r requirements.in
 pygments==2.6.1           # via bpython
 python-dateutil==2.5.3    # via -r requirements.in
