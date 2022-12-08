@@ -4,49 +4,110 @@
 #
 #    pip-compile --no-index requirements.in
 #
-aiohttp==3.6.2            # via discord.py
-async-timeout==3.0.1      # via aiohttp
-attrs==19.3.0             # via aiohttp
-blessings==1.7            # via curtsies
-bpython==0.19             # via -r requirements.in
-certifi==2020.6.20        # via requests
-chardet==3.0.4            # via aiohttp, requests
-curtsies==0.3.4           # via bpython
-decorator==4.4.2          # via praw
-defusedxml==0.6.0         # via odfpy
-diff-match-patch==20200713  # via django-import-export
-discord.py==1.3.4         # via -r requirements.in
-django-import-export==1.2.0  # via -r requirements.in
-django==2.2.13            # via -r requirements.in, django-import-export
-et-xmlfile==1.0.1         # via openpyxl
-greenlet==0.4.16          # via bpython
-idna-ssl==1.1.0           # via aiohttp
-idna==2.10                # via idna-ssl, requests, yarl
-jdcal==1.4.1              # via openpyxl
-markuppy==1.14            # via tablib
-mcrcon==0.5.2             # via -r requirements.in
-multidict==4.7.6          # via aiohttp, yarl
-odfpy==1.4.1              # via tablib
-openpyxl==3.0.4           # via tablib
-parsedatetime==2.1        # via -r requirements.in
-praw==3.3.0               # via -r requirements.in
-psutil==5.7.2             # via -r requirements.in
-psycopg2==2.8.2           # via -r requirements.in
-pygments==2.6.1           # via bpython
-python-dateutil==2.8.1    # via -r requirements.in
-pytz==2020.1              # via -r requirements.in, django
-pyyaml==5.3.1             # via tablib
-requests==2.24.0          # via bpython, praw, update-checker
-six==1.15.0               # via blessings, bpython, praw, python-dateutil
-sqlparse==0.3.1           # via django
-tablib[html,ods,xls,xlsx,yaml]==2.0.0  # via -r requirements.in, django-import-export
-tabulate==0.7.5           # via -r requirements.in
-typing-extensions==3.7.4.2  # via aiohttp, yarl
-update-checker==0.17      # via praw
-urllib3==1.25.10          # via requests
-uwsgi==2.0.18             # via -r requirements.in
-wcwidth==0.2.5            # via curtsies
-websockets==8.1           # via discord.py
-xlrd==1.2.0               # via tablib
-xlwt==1.3.0               # via tablib
-yarl==1.5.1               # via aiohttp
+aiohttp==3.6.2
+    # via discord-py
+async-timeout==3.0.1
+    # via aiohttp
+attrs==19.3.0
+    # via aiohttp
+blessings==1.7
+    # via curtsies
+bpython==0.19
+    # via -r requirements.in
+certifi==2022.12.7
+    # via requests
+chardet==3.0.4
+    # via
+    #   aiohttp
+    #   requests
+curtsies==0.3.4
+    # via bpython
+decorator==4.4.2
+    # via praw
+defusedxml==0.6.0
+    # via odfpy
+diff-match-patch==20200713
+    # via django-import-export
+discord-py==1.3.4
+    # via -r requirements.in
+django==2.2.13
+    # via
+    #   -r requirements.in
+    #   django-import-export
+django-import-export==1.2.0
+    # via -r requirements.in
+et-xmlfile==1.0.1
+    # via openpyxl
+greenlet==0.4.16
+    # via bpython
+idna==2.10
+    # via
+    #   requests
+    #   yarl
+jdcal==1.4.1
+    # via openpyxl
+markuppy==1.14
+    # via tablib
+mcrcon==0.5.2
+    # via -r requirements.in
+multidict==4.7.6
+    # via
+    #   aiohttp
+    #   yarl
+odfpy==1.4.1
+    # via tablib
+openpyxl==3.0.4
+    # via tablib
+parsedatetime==2.1
+    # via -r requirements.in
+praw==3.3.0
+    # via -r requirements.in
+psutil==5.7.2
+    # via -r requirements.in
+psycopg2==2.8.2
+    # via -r requirements.in
+pygments==2.6.1
+    # via bpython
+python-dateutil==2.8.1
+    # via -r requirements.in
+pytz==2020.1
+    # via
+    #   -r requirements.in
+    #   django
+pyyaml==5.3.1
+    # via tablib
+requests==2.24.0
+    # via
+    #   bpython
+    #   praw
+    #   update-checker
+six==1.15.0
+    # via
+    #   blessings
+    #   bpython
+    #   praw
+    #   python-dateutil
+sqlparse==0.3.1
+    # via django
+tablib[html,ods,xls,xlsx,yaml]==2.0.0
+    # via
+    #   -r requirements.in
+    #   django-import-export
+tabulate==0.7.5
+    # via -r requirements.in
+update-checker==0.17
+    # via praw
+urllib3==1.25.10
+    # via requests
+uwsgi==2.0.18
+    # via -r requirements.in
+wcwidth==0.2.5
+    # via curtsies
+websockets==8.1
+    # via discord-py
+xlrd==1.2.0
+    # via tablib
+xlwt==1.3.0
+    # via tablib
+yarl==1.5.1
+    # via aiohttp
